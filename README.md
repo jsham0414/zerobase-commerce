@@ -83,4 +83,5 @@
 
 erd
 ---
-![image](https://github.com/jsham0414/zerobase-commerce/assets/22838731/9ad09726-2638-49ea-a083-b54489bd8ad2)
+![commerce_erd](https://github.com/jsham0414/zerobase-commerce/assets/22838731/ea1b657e-c9e5-4b93-8ef2-5cec3a8f9c78)
+
