@@ -1,5 +1,7 @@
 package com.zerobase.commerce.api.security;
 
+import com.zerobase.commerce.api.exception.CustomException;
+import com.zerobase.commerce.api.exception.ErrorCode;
 import com.zerobase.commerce.api.user.service.AuthService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -7,6 +9,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -20,6 +23,8 @@ import java.util.Set;
 public class TokenProvider {
     private final AuthService authService;
 
+
+    private final String TOKEN_HEADER = "Authorization";
     private final String KEY_ROLES = "roles";
     private final long TOKEN_EXPIRE_TIME = 1000 * 60 * 60;
 
@@ -68,4 +73,12 @@ public class TokenProvider {
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
+    public String resolveTokenFromHeader(HttpHeaders headers) {
+        String token = headers.getFirst(TOKEN_HEADER);
+
+        if (token == null || token.isEmpty() || token.startsWith(tokenPrefix))
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
+
+        return getId(token.substring(tokenPrefix.length()));
+    }
 }
