@@ -15,7 +15,7 @@ public class CustomExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<?> runtimeExceptionHandler(Exception e) {
-        log.error("{} is occurred.", e.getCause().toString());
+        log.error("{} is occurred.", e.getMessage());
 
         return new ErrorResponse(
                 new CustomException(ErrorCode.UNEXPECTED_ERROR)

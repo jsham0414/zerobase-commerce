@@ -22,8 +22,6 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class TokenProvider {
     private final AuthService authService;
-
-
     private final String TOKEN_HEADER = "Authorization";
     private final String KEY_ROLES = "roles";
     private final long TOKEN_EXPIRE_TIME = 1000 * 60 * 60;

@@ -1,7 +1,6 @@
 package com.zerobase.commerce.api.user.controller;
 
 import com.zerobase.commerce.api.user.dto.UpdateUserInfo;
-import com.zerobase.commerce.api.user.dto.UserDto;
 import com.zerobase.commerce.api.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -20,13 +19,14 @@ public class UserController {
     }
 
     @PutMapping
-    void updateUserInfo(@RequestHeader HttpHeaders headers, @RequestBody UpdateUserInfo request) {
-        userService.updateUserInfo(headers, request);
+    ResponseEntity<?> updateUserInfo(@RequestHeader HttpHeaders headers, @RequestBody UpdateUserInfo request) {
+        return ResponseEntity.ok(userService.updateUserInfo(headers, request));
     }
 
     @DeleteMapping
-    void deleteUserInfo(@RequestHeader HttpHeaders headers, @RequestBody String password) {
+    ResponseEntity<?> deleteUserInfo(@RequestHeader HttpHeaders headers, @RequestBody String password) {
         userService.deleteUserInfo(headers, password);
+        return ResponseEntity.ok(null);
     }
 
 }

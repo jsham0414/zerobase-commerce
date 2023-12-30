@@ -47,7 +47,7 @@ public class AuthService implements UserDetailsService {
                 .orElseThrow(() -> new CustomException(ErrorCode.SIGN_IN_FAILED));
 
         if (!Objects.equals(user.getPassword(), request.getPassword())) {
-            throw new CustomException(ErrorCode.SIGN_IN_FAILED);
+            throw new CustomException(ErrorCode.PASSWORD_INCORRECT);
         }
 
         return AuthDto.Response.SignIn.builder()

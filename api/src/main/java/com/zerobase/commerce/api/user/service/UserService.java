@@ -38,7 +38,7 @@ public class UserService {
                 .build();
     }
 
-    public void updateUserInfo(HttpHeaders headers, UpdateUserInfo request) {
+    public UserDto updateUserInfo(HttpHeaders headers, UpdateUserInfo request) {
         String id = tokenProvider.resolveTokenFromHeader(headers);
         User user = userRepository.findById(id).orElseThrow(
                 () -> new CustomException(ErrorCode.INVALID_USER_ID)
@@ -53,6 +53,13 @@ public class UserService {
         user.setUpdatedAt(LocalDateTime.now());
 
         userRepository.save(user);
+
+        return UserDto.builder()
+                .id(id)
+                .password(user.getPassword())
+                .registeredAt(user.getRegisteredAt())
+                .updatedAt(user.getUpdatedAt())
+                .build();
     }
 
     public void deleteUserInfo(HttpHeaders headers, String password) {
