@@ -1,5 +1,7 @@
 package com.zerobase.commerce.database.domain;
 
+import com.zerobase.commerce.database.constant.AuthorityStatus;
+import com.zerobase.commerce.database.domain.converter.AuthorityStatusConverter;
 import com.zerobase.commerce.database.security.Encrypt;
 import jakarta.persistence.*;
 import lombok.*;
@@ -28,10 +30,9 @@ public class User implements UserDetails {
     @Encrypt
     private String password;
 
-    @Column(name = "role")
-    @ElementCollection
-    @CollectionTable(name = "AUTHORITY", joinColumns = @JoinColumn(name = "user_id"))
-    private Set<String> roles = new HashSet<>();
+    @Column(name = "roles")
+    @Convert(converter = AuthorityStatusConverter.class)
+    private Set<AuthorityStatus> roles = new HashSet<>();
 
     @Column(name = "registered_at")
     private LocalDateTime registeredAt;
@@ -41,7 +42,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles.stream().map(SimpleGrantedAuthority::new).toList();
+        return roles.stream().map(AuthorityStatus::toString).map(SimpleGrantedAuthority::new).toList();
     }
 
     @Override

@@ -3,12 +3,14 @@ package com.zerobase.commerce.api.security;
 import com.zerobase.commerce.api.exception.CustomException;
 import com.zerobase.commerce.api.exception.ErrorCode;
 import com.zerobase.commerce.api.user.service.AuthService;
+import com.zerobase.commerce.database.constant.AuthorityStatus;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -21,6 +23,7 @@ import java.util.Set;
 @Component
 @RequiredArgsConstructor
 public class TokenProvider {
+    @Lazy
     private final AuthService authService;
     private final String TOKEN_HEADER = "Authorization";
     private final String KEY_ROLES = "roles";
@@ -32,7 +35,7 @@ public class TokenProvider {
     @Value("${spring.jwt.prefix}")
     private String tokenPrefix;
 
-    public String generateToken(String id, Set<String> roles) {
+    public String generateToken(String id, Set<AuthorityStatus> roles) {
         var claims = Jwts.claims().setSubject(id);
         claims.put(KEY_ROLES, roles);
 

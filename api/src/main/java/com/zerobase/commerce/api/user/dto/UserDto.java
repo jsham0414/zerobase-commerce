@@ -1,5 +1,7 @@
 package com.zerobase.commerce.api.user.dto;
 
+import com.zerobase.commerce.database.constant.AuthorityStatus;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,7 +17,7 @@ import java.util.Set;
 public class UserDto {
     private String id;
     private String password;
-    private Set<String> roles;
+    private Set<AuthorityStatus> roles;
     private LocalDateTime registeredAt;
     private LocalDateTime updatedAt;
 }

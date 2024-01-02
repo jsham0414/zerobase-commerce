@@ -21,12 +21,23 @@ public class ErrorResponse {
         );
     }
 
+    public ResponseEntity<?> toResponseEntity(String message) {
+        var errorCode = customException.getErrorCode();
+
+        return ResponseEntity.status(errorCode.getStatusCode()).body(
+                ErrorResponseDto.builder()
+                        .errorCode(errorCode.getErrorCode())
+                        .errorMessage(message)
+                        .build()
+        );
+    }
+
     @Getter
     @AllArgsConstructor
     static class ErrorResponseDto {
-        private final LocalDateTime timeStamp;
         private String errorCode;
         private String errorMessage;
+        private final LocalDateTime timeStamp;
 
         public static ErrorResponseDtoBuilder builder() {
             return new ErrorResponseDtoBuilder();
