@@ -1,7 +1,7 @@
 package com.zerobase.commerce.database.domain;
 
 import com.zerobase.commerce.database.constant.AuthorityStatus;
-import com.zerobase.commerce.database.domain.converter.AuthorityStatusConverter;
+import com.zerobase.commerce.database.constant.converter.AuthorityStatusConverter;
 import com.zerobase.commerce.database.security.Encrypt;
 import jakarta.persistence.*;
 import lombok.*;

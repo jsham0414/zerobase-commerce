@@ -1,4 +1,4 @@
-package com.zerobase.commerce.database.domain.converter;
+package com.zerobase.commerce.database.constant.converter;
 
 import com.zerobase.commerce.database.constant.AuthorityStatus;
 import jakarta.persistence.AttributeConverter;
