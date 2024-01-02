@@ -1,7 +1,6 @@
 package com.zerobase.commerce.api.user.dto;
 
 import com.zerobase.commerce.database.constant.AuthorityStatus;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

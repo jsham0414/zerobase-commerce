@@ -3,7 +3,6 @@ package com.zerobase.commerce.api.user.dto;
 import com.zerobase.commerce.database.constant.AuthorityStatus;
 import com.zerobase.commerce.database.domain.User;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

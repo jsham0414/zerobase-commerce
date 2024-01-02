@@ -18,7 +18,7 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    private final TokenProvider tokenProvider;
+    private final TokenAuthenticator tokenAuthenticator;
 
     private final String TOKEN_HEADER = "Authorization";
 
@@ -32,8 +32,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
         String tokenExcludedHeader = resolveTokenFromRequest(request);
 
-        if (StringUtils.hasText(tokenExcludedHeader) && tokenProvider.validateToken(tokenExcludedHeader)) {
-            Authentication auth = tokenProvider.getAuthentication(tokenExcludedHeader);
+        if (StringUtils.hasText(tokenExcludedHeader) && tokenAuthenticator.validateToken(tokenExcludedHeader)) {
+            Authentication auth = tokenAuthenticator.getAuthentication(tokenExcludedHeader);
             SecurityContextHolder.getContext().setAuthentication(auth);
         }
 
