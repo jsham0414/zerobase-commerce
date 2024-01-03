@@ -1,0 +1,4 @@
+rootProject.name = 'Commerce'
+include 'api'
+include 'database'
+

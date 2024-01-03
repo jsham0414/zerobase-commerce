@@ -1,0 +1,11 @@
+spring:
+  profiles:
+    include:
+      - database
+  jwt:
+    secret: emVyby1iYXNlLXNwcmluZy1ib290LWRpdmlkZW5kLXR1dG9yaWFsLWp3dC1zZWNyZXQta2V5
+    prefix: "Bearer"
+
+server:
+  port: 8080
+
