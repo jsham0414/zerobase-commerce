@@ -1,6 +1,7 @@
 package com.zerobase.commerce.api.user.dto;
 
 import com.zerobase.commerce.database.constant.AuthorityStatus;
+import com.zerobase.commerce.database.domain.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,4 +20,14 @@ public class UserDto {
     private Set<AuthorityStatus> roles;
     private LocalDateTime registeredAt;
     private LocalDateTime updatedAt;
+
+    public static UserDto fromEntity(User user) {
+        return UserDto.builder()
+                .id(user.getId())
+                .password(user.getPassword())
+                .roles(user.getRoles())
+                .registeredAt(user.getRegisteredAt())
+                .updatedAt(user.getUpdatedAt())
+                .build();
+    }
 }

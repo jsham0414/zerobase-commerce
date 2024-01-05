@@ -32,7 +32,7 @@ public class TokenAuthenticator {
         try {
             return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
         } catch (ExpiredJwtException e) {
-            return e.getClaims();
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
         }
     }
 
@@ -55,7 +55,7 @@ public class TokenAuthenticator {
     public String resolveTokenFromHeader(HttpHeaders headers) {
         String token = headers.getFirst(TOKEN_HEADER);
 
-        if (token == null || token.isEmpty() || token.startsWith(tokenPrefix))
+        if (token == null || token.isEmpty() || !token.startsWith(tokenPrefix))
             throw new CustomException(ErrorCode.INVALID_TOKEN);
 
         return getId(token.substring(tokenPrefix.length()));

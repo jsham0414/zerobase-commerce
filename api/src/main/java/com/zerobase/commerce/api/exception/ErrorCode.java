@@ -11,7 +11,8 @@ public enum ErrorCode {
     SIGN_IN_FAILED(HttpStatus.BAD_REQUEST, "Login failed. Please check your input again."),
     PASSWORD_INCORRECT(HttpStatus.BAD_REQUEST, "Password is not equal. Please check your input again."),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "Invalid token. Please check again."),
-    VALIDATION_ERROR(HttpStatus.BAD_REQUEST);
+    VALIDATION_ERROR(HttpStatus.BAD_REQUEST),
+    ALREADY_GRANTED(HttpStatus.BAD_REQUEST, "It's already granted. Please check again.");
 
     private final HttpStatus statusCode;
     private final String errorCode;

@@ -31,4 +31,9 @@ public class UserController {
         return ResponseEntity.ok(null);
     }
 
+    @PutMapping("/seller")
+    ResponseEntity<?> grantSeller(@RequestHeader HttpHeaders headers, @NotBlank(message = "password must not be blank") @RequestBody String password) {
+        return ResponseEntity.ok(userService.grantSeller(headers, password));
+    }
+
 }

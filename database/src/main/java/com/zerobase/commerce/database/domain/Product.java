@@ -1,0 +1,48 @@
+package com.zerobase.commerce.database.domain;
+
+import com.zerobase.commerce.database.constant.ProductStatus;
+import com.zerobase.commerce.database.constant.converter.ProductStatusConverter;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+@Entity
+@Table(name = "PRODUCT")
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@ToString
+public class Product {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
+    @Column(name = "seller_id")
+    private String sellerId;
+
+    @Column(name = "name")
+    private String name;
+
+    @Column(name = "status")
+    @Convert(converter = ProductStatusConverter.class)
+    private ProductStatus status;
+
+    @Column(name = "price")
+    private Long price;
+
+    @Column(name = "discount")
+    private Double discount;
+
+    @Column(name = "star")
+    private Double star;
+
+    @Column(name = "published_at")
+    private LocalDateTime publishedAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+}

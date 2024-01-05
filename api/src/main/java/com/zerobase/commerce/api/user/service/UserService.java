@@ -5,6 +5,7 @@ import com.zerobase.commerce.api.exception.ErrorCode;
 import com.zerobase.commerce.api.security.TokenAuthenticator;
 import com.zerobase.commerce.api.user.dto.UpdateUserInfo;
 import com.zerobase.commerce.api.user.dto.UserDto;
+import com.zerobase.commerce.database.constant.AuthorityStatus;
 import com.zerobase.commerce.database.domain.User;
 import com.zerobase.commerce.database.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,16 +28,11 @@ public class UserService {
                 () -> new CustomException(ErrorCode.INVALID_USER_ID)
         );
 
-        if (!Objects.equals(user.getPassword(), password))
+        if (!Objects.equals(user.getPassword(), password)) {
             throw new CustomException(ErrorCode.PASSWORD_INCORRECT);
+        }
 
-        return UserDto.builder()
-                .id(user.getId())
-                .password(user.getPassword())
-                .roles(user.getRoles())
-                .registeredAt(user.getRegisteredAt())
-                .updatedAt(user.getUpdatedAt())
-                .build();
+        return UserDto.fromEntity(user);
     }
 
     @Transactional
@@ -46,22 +42,19 @@ public class UserService {
                 () -> new CustomException(ErrorCode.INVALID_USER_ID)
         );
 
-        if (!Objects.equals(user.getPassword(), request.getPassword()))
+        if (!Objects.equals(user.getPassword(), request.getPassword())) {
             throw new CustomException(ErrorCode.PASSWORD_INCORRECT);
+        }
 
-        if (Objects.nonNull(request.getNewPassword()))
+        if (Objects.nonNull(request.getNewPassword())) {
             user.setPassword(request.getNewPassword());
+        }
 
         user.setUpdatedAt(LocalDateTime.now());
 
         userRepository.save(user);
 
-        return UserDto.builder()
-                .id(id)
-                .password(user.getPassword())
-                .registeredAt(user.getRegisteredAt())
-                .updatedAt(user.getUpdatedAt())
-                .build();
+        return UserDto.fromEntity(user);
     }
 
     @Transactional
@@ -75,5 +68,27 @@ public class UserService {
             throw new CustomException(ErrorCode.PASSWORD_INCORRECT);
 
         userRepository.delete(user);
+    }
+
+    @Transactional
+    public UserDto grantSeller(HttpHeaders headers, String password) {
+        String id = tokenAuthenticator.resolveTokenFromHeader(headers);
+        User user = userRepository.findById(id).orElseThrow(
+                () -> new CustomException(ErrorCode.INVALID_USER_ID)
+        );
+
+        if (!Objects.equals(user.getPassword(), password)) {
+            throw new CustomException(ErrorCode.PASSWORD_INCORRECT);
+        }
+
+        if (user.getRoles().contains(AuthorityStatus.ROLE_SELLER)) {
+            throw new CustomException(ErrorCode.ALREADY_GRANTED);
+        }
+
+        user.getRoles().add(AuthorityStatus.ROLE_SELLER);
+
+        userRepository.save(user);
+
+        return UserDto.fromEntity(user);
     }
 }
