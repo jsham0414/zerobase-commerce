@@ -128,7 +128,7 @@ public class ProductService {
                 () -> new CustomException(ErrorCode.INVALID_USER_ID)
         );
 
-        return productRepository.findBySellerIdOrderByUpdateAtDesc(user.getId())
+        return productRepository.findBySellerIdOrderByUpdatedAtDesc(user.getId())
                 .stream()
                 .map(ProductDto::fromEntity)
                 .toList();

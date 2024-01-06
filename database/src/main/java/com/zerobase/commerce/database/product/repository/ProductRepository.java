@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ProductRepository extends JpaRepository<Product, UUID>, JpaSpecificationExecutor<Product> {
-    List<Product> findBySellerIdOrderByUpdateAtDesc(String sellerId);
+    List<Product> findBySellerIdOrderByUpdatedAtDesc(String sellerId);
 
     List<Product> findByName(String name);
 }
