@@ -7,12 +7,16 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
     UNEXPECTED_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error occurred."),
     USER_ID_DUPLICATED(HttpStatus.BAD_REQUEST, "ID duplicated. Please enter a different ID."),
-    INVALID_USER_ID(HttpStatus.BAD_REQUEST, "The ID you entered is an ID that does not exist. Please enter a different ID."),
+    INVALID_USER_ID(HttpStatus.FORBIDDEN, "The ID you entered is an ID that does not exist. Please enter a different ID."),
     SIGN_IN_FAILED(HttpStatus.BAD_REQUEST, "Login failed. Please check your input again."),
     PASSWORD_INCORRECT(HttpStatus.BAD_REQUEST, "Password is not equal. Please check your input again."),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "Invalid token. Please check again."),
     VALIDATION_ERROR(HttpStatus.BAD_REQUEST),
-    ALREADY_GRANTED(HttpStatus.BAD_REQUEST, "It's already granted. Please check again.");
+    ALREADY_GRANTED(HttpStatus.BAD_REQUEST, "It's already granted. Please check again."),
+    INVALID_PRODUCT_ID(HttpStatus.FORBIDDEN, "The ID you entered is an ID that does not exist. Please enter a different ID."),
+    SELLER_ID_NOT_SAME(HttpStatus.FORBIDDEN, "Seller ID does not match, please enter a different ID."),
+    BAD_REQUEST(HttpStatus.BAD_REQUEST, "Invalid request."),
+    PRIVATE_PRODUCT(HttpStatus.BAD_REQUEST, "The status of this product is Private, it cannot be queried.");
 
     private final HttpStatus statusCode;
     private final String errorCode;

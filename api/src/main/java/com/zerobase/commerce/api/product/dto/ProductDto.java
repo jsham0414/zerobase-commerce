@@ -1,7 +1,7 @@
 package com.zerobase.commerce.api.product.dto;
 
-import com.zerobase.commerce.database.constant.ProductStatus;
-import com.zerobase.commerce.database.domain.Product;
+import com.zerobase.commerce.database.product.constant.ProductStatus;
+import com.zerobase.commerce.database.product.domain.Product;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

@@ -1,7 +1,7 @@
-package com.zerobase.commerce.database.domain;
+package com.zerobase.commerce.database.product.domain;
 
-import com.zerobase.commerce.database.constant.ProductStatus;
-import com.zerobase.commerce.database.constant.converter.ProductStatusConverter;
+import com.zerobase.commerce.database.product.constant.ProductStatus;
+import com.zerobase.commerce.database.product.constant.converter.ProductStatusConverter;
 import jakarta.persistence.*;
 import lombok.*;
 

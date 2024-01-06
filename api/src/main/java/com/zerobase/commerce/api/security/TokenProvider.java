@@ -1,6 +1,6 @@
 package com.zerobase.commerce.api.security;
 
-import com.zerobase.commerce.database.constant.AuthorityStatus;
+import com.zerobase.commerce.database.user.constant.AuthorityStatus;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;

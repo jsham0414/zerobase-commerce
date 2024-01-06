@@ -1,8 +1,8 @@
-package com.zerobase.commerce.database.domain;
+package com.zerobase.commerce.database.user.domain;
 
-import com.zerobase.commerce.database.constant.AuthorityStatus;
-import com.zerobase.commerce.database.constant.converter.AuthorityStatusConverter;
 import com.zerobase.commerce.database.security.Encrypt;
+import com.zerobase.commerce.database.user.constant.AuthorityStatus;
+import com.zerobase.commerce.database.user.constant.converter.AuthorityStatusConverter;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;

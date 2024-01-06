@@ -1,4 +1,4 @@
-package com.zerobase.commerce.database.constant;
+package com.zerobase.commerce.database.product.constant;
 
 public enum ProductStatus {
     PUBLIC,

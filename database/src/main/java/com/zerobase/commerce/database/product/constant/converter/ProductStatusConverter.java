@@ -1,6 +1,6 @@
-package com.zerobase.commerce.database.constant.converter;
+package com.zerobase.commerce.database.product.constant.converter;
 
-import com.zerobase.commerce.database.constant.ProductStatus;
+import com.zerobase.commerce.database.product.constant.ProductStatus;
 import jakarta.persistence.AttributeConverter;
 
 public class ProductStatusConverter implements AttributeConverter<ProductStatus, String> {
