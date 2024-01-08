@@ -2,6 +2,7 @@ package com.zerobase.commerce.api.product.dto;
 
 import com.zerobase.commerce.api.validation.EnumCheck;
 import com.zerobase.commerce.database.product.constant.ProductStatus;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -26,7 +27,7 @@ public class UpdateProduct {
     @EnumCheck(check = ProductStatus.class, message = "Status is invalid")
     private String status;
 
-    @Range(min = 0L, message = "Discount must be at least zero")
+    @Min(value = 0L, message = "Discount must be at least zero")
     private Long price;
 
     @Range(min = 0, max = 100, message = "Discount must be 0 to 100")

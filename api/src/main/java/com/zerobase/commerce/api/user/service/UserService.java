@@ -87,8 +87,6 @@ public class UserService {
 
         user.getRoles().add(AuthorityStatus.ROLE_SELLER);
 
-        userRepository.save(user);
-
-        return UserDto.fromEntity(user);
+        return UserDto.fromEntity(userRepository.save(user));
     }
 }

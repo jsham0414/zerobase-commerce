@@ -25,8 +25,8 @@ public class ProductController {
 
     @PreAuthorize("hasRole('ROLE_SELLER')")
     @PostMapping
-    ResponseEntity<?> addProduct(
-            @RequestHeader HttpHeaders headers, @Validated @RequestBody AddProduct request) {
+    ResponseEntity<?> addProduct(@RequestHeader HttpHeaders headers,
+                                 @Validated @RequestBody AddProduct request) {
         return ResponseEntity.ok(productService.addProduct(headers, request));
     }
 
@@ -38,15 +38,15 @@ public class ProductController {
 
     @PreAuthorize("hasRole('ROLE_SELLER')")
     @PutMapping
-    ResponseEntity<?> updateProduct(
-            @RequestHeader HttpHeaders headers, @Validated @RequestBody UpdateProduct request) {
+    ResponseEntity<?> updateProduct(@RequestHeader HttpHeaders headers,
+                                    @Validated @RequestBody UpdateProduct request) {
         return ResponseEntity.ok(productService.updateProduct(headers, request));
     }
 
     @PreAuthorize("hasRole('ROLE_SELLER')")
     @DeleteMapping
-    ResponseEntity<?> deleteProduct(
-            @RequestHeader HttpHeaders headers, @NotNull(message = "Id is must not be null") @RequestBody UUID productId) {
+    ResponseEntity<?> deleteProduct(@RequestHeader HttpHeaders headers,
+                                    @NotNull(message = "Id is must not be null") @RequestBody UUID productId) {
         productService.deleteProduct(headers, productId);
         return ResponseEntity.ok(null);
     }
@@ -59,10 +59,10 @@ public class ProductController {
     }
 
     @GetMapping
-    ResponseEntity<?> getProducts(
-            @NotBlank(message = "Name is must not be blank") @RequestParam String name,
-            @EnumCheck(check = ProductSortFilter.class, message = "") @RequestParam(required = false) String filter,
-            @EnumCheck(check = SortOrder.class, message = "") @RequestParam(required = false) String order) {
+    ResponseEntity<?> getProducts(@NotBlank(message = "Name is must not be blank")
+                                  @RequestParam String name,
+                                  @EnumCheck(check = ProductSortFilter.class, message = "") @RequestParam(required = false) String filter,
+                                  @EnumCheck(check = SortOrder.class, message = "") @RequestParam(required = false) String order) {
         return ResponseEntity.ok(productService.getProductsByName(name, filter, order));
     }
 

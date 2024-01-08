@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -33,6 +34,7 @@ public class ProductService {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
 
+    @Transactional
     public ProductDto addProduct(HttpHeaders headers, AddProduct request) {
         String id = tokenAuthenticator.resolveTokenFromHeader(headers);
         User user = userRepository.findById(id).orElseThrow(
@@ -73,6 +75,7 @@ public class ProductService {
         return ProductDto.fromEntity(product);
     }
 
+    @Transactional
     public ProductDto updateProduct(HttpHeaders headers, UpdateProduct request) {
         String id = tokenAuthenticator.resolveTokenFromHeader(headers);
         User user = userRepository.findById(id).orElseThrow(
@@ -105,6 +108,7 @@ public class ProductService {
         return ProductDto.fromEntity(product);
     }
 
+    @Transactional
     public void deleteProduct(HttpHeaders headers, UUID productId) {
         String id = tokenAuthenticator.resolveTokenFromHeader(headers);
         User user = userRepository.findById(id).orElseThrow(
@@ -118,6 +122,8 @@ public class ProductService {
         if (!Objects.equals(product.getSellerId(), user.getId())) {
             throw new CustomException(ErrorCode.SELLER_ID_NOT_SAME);
         }
+
+        // TODO: 앞으로 추가 될 Wishlist, Order, Review도 지운다?
 
         productRepository.delete(product);
     }

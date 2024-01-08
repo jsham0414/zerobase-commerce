@@ -15,8 +15,10 @@ public enum ErrorCode {
     ALREADY_GRANTED(HttpStatus.BAD_REQUEST, "It's already granted. Please check again."),
     INVALID_PRODUCT_ID(HttpStatus.FORBIDDEN, "The ID you entered is an ID that does not exist. Please enter a different ID."),
     SELLER_ID_NOT_SAME(HttpStatus.FORBIDDEN, "Seller ID does not match, please enter a different ID."),
+    USER_ID_NOT_SAME(HttpStatus.FORBIDDEN, "User ID does not match, please enter a different ID."),
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "Invalid request."),
-    PRIVATE_PRODUCT(HttpStatus.BAD_REQUEST, "The status of this product is Private, it cannot be queried.");
+    PRIVATE_PRODUCT(HttpStatus.BAD_REQUEST, "The status of this product is Private, it cannot be queried."),
+    INVALID_WISHLIST_ID(HttpStatus.FORBIDDEN, "The ID you entered is an ID that does not exist. Please enter a different ID.");
 
     private final HttpStatus statusCode;
     private final String errorCode;
