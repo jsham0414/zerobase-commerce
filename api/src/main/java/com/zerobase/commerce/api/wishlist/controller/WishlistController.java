@@ -37,6 +37,7 @@ public class WishlistController {
     @DeleteMapping("/{id}")
     ResponseEntity<?> deleteWishlist(@RequestHeader HttpHeaders headers,
                                      @NotNull(message = "Wishlist Id must not be null") @PathVariable Long id) {
-        return ResponseEntity.ok(wishlistService);
+        wishlistService.deleteWishlist(headers, id);
+        return ResponseEntity.ok(null);
     }
 }
