@@ -18,6 +18,7 @@ import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class UserService {
     private final UserRepository userRepository;
     private final TokenAuthenticator tokenAuthenticator;
@@ -38,7 +39,7 @@ public class UserService {
     @Transactional
     public UserDto updateUserInfo(HttpHeaders headers, UpdateUserInfo request) {
         String id = tokenAuthenticator.resolveTokenFromHeader(headers);
-        User user = userRepository.findById(id).orElseThrow(
+        User user = userRepository.findByIdAndDecryptPassword(id).orElseThrow(
                 () -> new CustomException(ErrorCode.INVALID_USER_ID)
         );
 
@@ -73,7 +74,7 @@ public class UserService {
     @Transactional
     public UserDto grantSeller(HttpHeaders headers, String password) {
         String id = tokenAuthenticator.resolveTokenFromHeader(headers);
-        User user = userRepository.findById(id).orElseThrow(
+        User user = userRepository.findByIdAndDecryptPassword(id).orElseThrow(
                 () -> new CustomException(ErrorCode.INVALID_USER_ID)
         );
 

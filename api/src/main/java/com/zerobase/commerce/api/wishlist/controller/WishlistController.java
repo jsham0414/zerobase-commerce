@@ -29,14 +29,14 @@ public class WishlistController {
 
     @PutMapping("/{id}")
     ResponseEntity<?> updateWishlist(@RequestHeader HttpHeaders headers,
-                                     @NotNull(message = "Wishlist Id must not be null") @PathVariable Long id,
+                                     @NotNull(message = "Wishlist Id must not be null") @PathVariable(name = "id") Long id,
                                      @Validated @RequestBody UpdateWishlist request) {
         return ResponseEntity.ok(wishlistService.updateWishlist(headers, id, request));
     }
 
     @DeleteMapping("/{id}")
     ResponseEntity<?> deleteWishlist(@RequestHeader HttpHeaders headers,
-                                     @NotNull(message = "Wishlist Id must not be null") @PathVariable Long id) {
+                                     @NotNull(message = "Wishlist Id must not be null") @PathVariable(name = "id") Long id) {
         wishlistService.deleteWishlist(headers, id);
         return ResponseEntity.ok(null);
     }

@@ -12,6 +12,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.Date;
@@ -47,6 +48,7 @@ public class TokenAuthenticator {
         return !parseClaims(token).getExpiration().before(new Date());
     }
 
+    @Transactional
     Authentication getAuthentication(String jwt) {
         var userDetails = authService.loadUserByUsername(getId(jwt));
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());

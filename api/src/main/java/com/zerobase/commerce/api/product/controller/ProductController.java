@@ -52,18 +52,22 @@ public class ProductController {
     }
 
     @PreAuthorize("hasRole('ROLE_SELLER')")
-    @GetMapping("/products")
+    @GetMapping("/seller")
     ResponseEntity<?> getProductsBySeller(
             @RequestHeader HttpHeaders headers) {
         return ResponseEntity.ok(productService.getProductsBySeller(headers));
     }
 
     @GetMapping
-    ResponseEntity<?> getProducts(@NotBlank(message = "Name is must not be blank")
-                                  @RequestParam String name,
+    ResponseEntity<?> getProducts(@NotBlank(message = "Name is must not be blank") @RequestParam String name,
                                   @EnumCheck(check = ProductSortFilter.class, message = "") @RequestParam(required = false) String filter,
                                   @EnumCheck(check = SortOrder.class, message = "") @RequestParam(required = false) String order) {
         return ResponseEntity.ok(productService.getProductsByName(name, filter, order));
+    }
+
+    @GetMapping("/ranking")
+    ResponseEntity<?> getStarRanking() {
+        return ResponseEntity.ok(productService.getStarRanking());
     }
 
 }

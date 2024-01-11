@@ -22,6 +22,7 @@ import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class AuthService implements UserDetailsService {
     private final UserRepository userRepository;
     private final TokenProvider tokenProvider;
@@ -57,7 +58,7 @@ public class AuthService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findById(username).orElseThrow(() -> new UsernameNotFoundException("couldn't find id " + username));
+    public UserDetails loadUserByUsername(String username) throws CustomException {
+        return userRepository.findById(username).orElseThrow(() -> new CustomException(ErrorCode.INVALID_USER_ID));
     }
 }
