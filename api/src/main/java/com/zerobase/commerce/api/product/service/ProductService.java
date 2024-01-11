@@ -17,6 +17,7 @@ import com.zerobase.commerce.database.review.domain.Review;
 import com.zerobase.commerce.database.review.repository.ReviewRepository;
 import com.zerobase.commerce.database.user.domain.User;
 import com.zerobase.commerce.database.user.repository.UserRepository;
+import com.zerobase.commerce.database.wishlist.repository.WishlistRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.domain.Specification;
@@ -42,6 +43,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final ReviewRepository reviewRepository;
     private final RedisTemplate<String, String> redisTemplate;
+    private final WishlistRepository wishlistRepository;
 
     private final String starKey = "star";
 
@@ -52,6 +54,8 @@ public class ProductService {
 
         for (Product product : products) {
             double sum = 0.0;
+
+
 
             List<Review> reviews = reviewRepository.findByProductId(product.getId());
             if (reviews.isEmpty()) {
@@ -65,7 +69,11 @@ public class ProductService {
             product.setStar(sum / reviews.size());
 
             String key = String.format("%s:%s", product.getId(), product.getName());
-            redisTemplate.opsForZSet().add(starKey, key, product.getStar());
+            if (product.getStatus() != ProductStatus.PUBLIC && redisTemplate.boundZSetOps(starKey).score(key) != null) {
+                redisTemplate.opsForZSet().remove(starKey, key);
+            } else if (product.getStatus() == ProductStatus.PUBLIC) {
+                redisTemplate.opsForZSet().add(starKey, key, product.getStar());
+            }
 
             productRepository.save(product);
 
@@ -118,8 +126,13 @@ public class ProductService {
                 () -> new CustomException(ErrorCode.INVALID_PRODUCT_ID)
         );
 
-        if (product.getStatus() == ProductStatus.PRIVATE)
+        if (product.getStatus() == ProductStatus.PRIVATE) {
             throw new CustomException(ErrorCode.PRIVATE_PRODUCT);
+        }
+
+        if (Objects.equals(product.getStatus(), ProductStatus.DELETED)) {
+            throw new CustomException(ErrorCode.DELETED_PRODUCT);
+        }
 
         return ProductDto.fromEntity(product);
     }
@@ -137,6 +150,10 @@ public class ProductService {
 
         if (!Objects.equals(product.getSellerId(), user.getId())) {
             throw new CustomException(ErrorCode.SELLER_ID_NOT_SAME);
+        }
+
+        if (Objects.equals(product.getStatus(), ProductStatus.DELETED)) {
+            throw new CustomException(ErrorCode.DELETED_PRODUCT);
         }
 
         if (request.getName() != null) {
@@ -172,18 +189,24 @@ public class ProductService {
             throw new CustomException(ErrorCode.SELLER_ID_NOT_SAME);
         }
 
-        // TODO: 앞으로 추가 될 Wishlist, Order, Review도 지운다?
+        if (Objects.equals(product.getStatus(), ProductStatus.DELETED)) {
+            throw new CustomException(ErrorCode.DELETED_PRODUCT);
+        }
 
-        productRepository.delete(product);
+        wishlistRepository.deleteAllByProductId(productId);
+
+        product.setStatus(ProductStatus.DELETED);
     }
 
     public List<ProductDto> getProductsBySeller(HttpHeaders headers) {
         String id = tokenAuthenticator.resolveTokenFromHeader(headers);
-        User user = userRepository.findById(id).orElseThrow(
-                () -> new CustomException(ErrorCode.INVALID_USER_ID)
-        );
 
-        return productRepository.findBySellerIdOrderByUpdatedAtDesc(user.getId())
+        Specification<Product> specification = Specification
+                .where(ProductSpecification.sellerIdEquals(id))
+                .and(ProductSpecification.notDeleted())
+                .and(ProductSpecification.orderByUpdatedAtDesc());
+
+        return productRepository.findAll(specification)
                 .stream()
                 .map(ProductDto::fromEntity)
                 .toList();

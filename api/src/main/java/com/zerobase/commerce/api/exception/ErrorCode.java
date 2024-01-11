@@ -25,7 +25,8 @@ public enum ErrorCode {
     INVALID_ORDER_ID(HttpStatus.FORBIDDEN, "The ID you entered is an ID that does not exist. Please enter a different ID."),
     ALREADY_PROCESSED(HttpStatus.BAD_REQUEST, "It's already processed order. Please check again."),
     WRITTEN_REVIEW(HttpStatus.BAD_REQUEST, "It's already written review. Please check again."),
-    INVALID_REVIEW_ID(HttpStatus.FORBIDDEN, "The ID you entered is an ID that does not exist. Please enter a different ID.");
+    INVALID_REVIEW_ID(HttpStatus.FORBIDDEN, "The ID you entered is an ID that does not exist. Please enter a different ID."),
+    DELETED_PRODUCT(HttpStatus.BAD_REQUEST, "It's deleted product. Please check again.");
 
     private final HttpStatus statusCode;
     private final String errorCode;

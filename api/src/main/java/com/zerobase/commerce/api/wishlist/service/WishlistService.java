@@ -26,6 +26,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -44,8 +45,12 @@ public class WishlistService {
                 () -> new CustomException(ErrorCode.INVALID_USER_ID)
         );
 
-        if (!productRepository.existsById(request.getProductId())) {
-            throw new CustomException(ErrorCode.INVALID_PRODUCT_ID);
+        Product product = productRepository.findById(request.getProductId()).orElseThrow(
+                () -> new CustomException(ErrorCode.INVALID_PRODUCT_ID)
+        );
+
+        if (product.getStatus() == ProductStatus.DELETED) {
+            throw new CustomException(ErrorCode.DELETED_PRODUCT);
         }
 
         Wishlist wishlist = Wishlist.builder()
@@ -109,4 +114,5 @@ public class WishlistService {
 
         wishlistRepository.delete(wishlist);
     }
+
 }
