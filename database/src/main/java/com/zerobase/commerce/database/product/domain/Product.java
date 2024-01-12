@@ -1,7 +1,6 @@
 package com.zerobase.commerce.database.product.domain;
 
 import com.zerobase.commerce.database.product.constant.ProductStatus;
-import com.zerobase.commerce.database.product.constant.converter.ProductStatusConverter;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -30,7 +29,7 @@ public class Product {
     private String name;
 
     @Column(name = "status")
-    @Convert(converter = ProductStatusConverter.class)
+    @Enumerated(EnumType.STRING)
     private ProductStatus status;
 
     @Column(name = "price")

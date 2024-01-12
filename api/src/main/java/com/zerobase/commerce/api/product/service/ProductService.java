@@ -171,8 +171,6 @@ public class ProductService {
             product.setDiscount(request.getDiscount());
         }
 
-        productRepository.save(product);
-
         return ProductDto.fromEntity(product);
     }
 

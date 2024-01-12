@@ -1,7 +1,6 @@
 package com.zerobase.commerce.database.order.domain;
 
 import com.zerobase.commerce.database.order.constant.OrderStatus;
-import com.zerobase.commerce.database.order.constant.converter.OrderStatusConverter;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -37,7 +36,7 @@ public class Order {
     private Double discount;
 
     @Column(name = "status")
-    @Convert(converter = OrderStatusConverter.class)
+    @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
     @CreatedDate

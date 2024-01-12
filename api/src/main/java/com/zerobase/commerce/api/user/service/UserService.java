@@ -59,7 +59,7 @@ public class UserService {
 
         redisTemplate.opsForValue().set(CacheKey.KEY_USER + ":" + user.getId(), user, 600, TimeUnit.SECONDS);
 
-        return UserDto.fromEntity(userRepository.save(user));
+        return UserDto.fromEntity(user);
     }
 
     @Transactional
@@ -94,6 +94,6 @@ public class UserService {
 
         user.getRoles().add(AuthorityStatus.ROLE_SELLER);
 
-        return UserDto.fromEntity(userRepository.save(user));
+        return UserDto.fromEntity(user);
     }
 }

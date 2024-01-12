@@ -79,7 +79,7 @@ public class OrderService {
 
         order.setStatus(OrderStatus.APPROVED);
 
-        return OrderDto.fromEntity(orderRepository.save(order));
+        return OrderDto.fromEntity(order);
     }
 
     @Transactional
@@ -107,7 +107,7 @@ public class OrderService {
 
         order.setStatus(OrderStatus.CANCELED);
 
-        return OrderDto.fromEntity(orderRepository.save(order));
+        return OrderDto.fromEntity(order);
     }
 
     @Transactional
@@ -143,7 +143,7 @@ public class OrderService {
 
         order.setStatus(OrderStatus.REJECTED);
 
-        return OrderDto.fromEntity(orderRepository.save(order));
+        return OrderDto.fromEntity(order);
     }
 
     public List<OrderDto> getOrdersByUser(HttpHeaders headers) {

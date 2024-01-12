@@ -89,7 +89,7 @@ public class WishlistService {
             wishlist.setAmount(request.getAmount());
         }
 
-        return WishlistDto.fromEntity(wishlistRepository.save(wishlist));
+        return WishlistDto.fromEntity(wishlist);
     }
 
     @Transactional
