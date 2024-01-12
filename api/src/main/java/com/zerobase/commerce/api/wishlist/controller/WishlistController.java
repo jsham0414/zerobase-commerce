@@ -1,5 +1,6 @@
 package com.zerobase.commerce.api.wishlist.controller;
 
+import com.zerobase.commerce.api.security.TokenAuthenticator;
 import com.zerobase.commerce.api.wishlist.dto.AddWishlist;
 import com.zerobase.commerce.api.wishlist.dto.UpdateWishlist;
 import com.zerobase.commerce.api.wishlist.service.WishlistService;
@@ -15,29 +16,34 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/wishlist")
 public class WishlistController {
     private final WishlistService wishlistService;
+    private final TokenAuthenticator tokenAuthenticator;
 
     @PostMapping
     ResponseEntity<?> addWishlist(@RequestHeader HttpHeaders headers,
                                   @Validated @RequestBody AddWishlist request) {
-        return ResponseEntity.ok(wishlistService.addWishlist(headers, request));
+        String userId = tokenAuthenticator.resolveTokenFromHeader(headers);
+        return ResponseEntity.ok(wishlistService.addWishlist(userId, request));
     }
 
     @GetMapping
     ResponseEntity<?> getWishlist(@RequestHeader HttpHeaders headers) {
-        return ResponseEntity.ok(wishlistService.getWishlist(headers));
+        String userId = tokenAuthenticator.resolveTokenFromHeader(headers);
+        return ResponseEntity.ok(wishlistService.getWishlist(userId));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{wishlistId}")
     ResponseEntity<?> updateWishlist(@RequestHeader HttpHeaders headers,
-                                     @NotNull(message = "Wishlist Id must not be null") @PathVariable(name = "id") Long id,
+                                     @NotNull(message = "wishlistId must not be null") @PathVariable(name = "wishlistId") Long wishlistId,
                                      @Validated @RequestBody UpdateWishlist request) {
-        return ResponseEntity.ok(wishlistService.updateWishlist(headers, id, request));
+        String userId = tokenAuthenticator.resolveTokenFromHeader(headers);
+        return ResponseEntity.ok(wishlistService.updateWishlist(userId, wishlistId, request));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{wishlistId}")
     ResponseEntity<?> deleteWishlist(@RequestHeader HttpHeaders headers,
-                                     @NotNull(message = "Wishlist Id must not be null") @PathVariable(name = "id") Long id) {
-        wishlistService.deleteWishlist(headers, id);
+                                     @NotNull(message = "wishlistId must not be null") @PathVariable(name = "wishlistId") Long wishListId) {
+        String userId = tokenAuthenticator.resolveTokenFromHeader(headers);
+        wishlistService.deleteWishlist(userId, wishListId);
         return ResponseEntity.ok(null);
     }
 }

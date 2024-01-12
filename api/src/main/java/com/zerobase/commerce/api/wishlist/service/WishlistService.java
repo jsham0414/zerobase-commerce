@@ -2,7 +2,6 @@ package com.zerobase.commerce.api.wishlist.service;
 
 import com.zerobase.commerce.api.exception.CustomException;
 import com.zerobase.commerce.api.exception.ErrorCode;
-import com.zerobase.commerce.api.security.TokenAuthenticator;
 import com.zerobase.commerce.api.wishlist.dto.AddWishlist;
 import com.zerobase.commerce.api.wishlist.dto.UpdateWishlist;
 import com.zerobase.commerce.api.wishlist.dto.WishlistDto;
@@ -15,7 +14,6 @@ import com.zerobase.commerce.database.user.repository.UserRepository;
 import com.zerobase.commerce.database.wishlist.domain.Wishlist;
 import com.zerobase.commerce.database.wishlist.repository.WishlistRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,16 +28,10 @@ public class WishlistService {
     private final WishlistRepository wishlistRepository;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
-    private final TokenAuthenticator tokenAuthenticator;
     private final OrderRepository orderRepository;
 
     @Transactional
-    public WishlistDto addWishlist(HttpHeaders headers, AddWishlist request) {
-        String id = tokenAuthenticator.resolveTokenFromHeader(headers);
-        User user = userRepository.findById(id).orElseThrow(
-                () -> new CustomException(ErrorCode.INVALID_USER_ID)
-        );
-
+    public WishlistDto addWishlist(String userId, AddWishlist request) {
         Product product = productRepository.findById(request.getProductId()).orElseThrow(
                 () -> new CustomException(ErrorCode.INVALID_PRODUCT_ID)
         );
@@ -49,7 +41,7 @@ public class WishlistService {
         }
 
         Wishlist wishlist = Wishlist.builder()
-                .userId(user.getId())
+                .userId(userId)
                 .productId(request.getProductId())
                 .amount(request.getAmount())
                 .addedAt(LocalDateTime.now())
@@ -58,9 +50,8 @@ public class WishlistService {
         return WishlistDto.fromEntity(wishlistRepository.save(wishlist));
     }
 
-    public List<WishlistDto> getWishlist(HttpHeaders headers) {
-        String id = tokenAuthenticator.resolveTokenFromHeader(headers);
-        User user = userRepository.findById(id).orElseThrow(
+    public List<WishlistDto> getWishlist(String userId) {
+        User user = userRepository.findById(userId).orElseThrow(
                 () -> new CustomException(ErrorCode.INVALID_USER_ID)
         );
 
@@ -71,8 +62,7 @@ public class WishlistService {
     }
 
     @Transactional
-    public WishlistDto updateWishlist(HttpHeaders headers, Long id, UpdateWishlist request) {
-        String userId = tokenAuthenticator.resolveTokenFromHeader(headers);
+    public WishlistDto updateWishlist(String userId, Long id, UpdateWishlist request) {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new CustomException(ErrorCode.INVALID_USER_ID)
         );
@@ -93,17 +83,12 @@ public class WishlistService {
     }
 
     @Transactional
-    public void deleteWishlist(HttpHeaders headers, Long id) {
-        String userId = tokenAuthenticator.resolveTokenFromHeader(headers);
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new CustomException(ErrorCode.INVALID_USER_ID)
-        );
-
+    public void deleteWishlist(String userId, Long id) {
         Wishlist wishlist = wishlistRepository.findById(id).orElseThrow(
                 () -> new CustomException(ErrorCode.INVALID_WISHLIST_ID)
         );
 
-        if (!Objects.equals(wishlist.getUserId(), user.getId())) {
+        if (!Objects.equals(wishlist.getUserId(), userId)) {
             throw new CustomException(ErrorCode.USER_ID_NOT_SAME);
         }
 

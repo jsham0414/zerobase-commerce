@@ -5,7 +5,6 @@ import com.zerobase.commerce.api.exception.ErrorCode;
 import com.zerobase.commerce.api.review.dto.ModifyReview;
 import com.zerobase.commerce.api.review.dto.ReviewDto;
 import com.zerobase.commerce.api.review.dto.WriteReview;
-import com.zerobase.commerce.api.security.TokenAuthenticator;
 import com.zerobase.commerce.database.product.repository.ProductRepository;
 import com.zerobase.commerce.database.review.domain.Review;
 import com.zerobase.commerce.database.review.repository.ReviewRepository;
@@ -14,7 +13,6 @@ import com.zerobase.commerce.database.user.domain.User;
 import com.zerobase.commerce.database.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,7 +27,6 @@ import java.util.UUID;
 public class ReviewService {
     private final UserRepository userRepository;
     private final ReviewRepository reviewRepository;
-    private final TokenAuthenticator tokenAuthenticator;
     private final ProductRepository productRepository;
 
     public ReviewDto getReview(Long id) {
@@ -40,8 +37,7 @@ public class ReviewService {
         return ReviewDto.fromEntity(review);
     }
 
-    public List<ReviewDto> getSelfReviews(HttpHeaders headers) {
-        String userId = tokenAuthenticator.resolveTokenFromHeader(headers);
+    public List<ReviewDto> getSelfReviews(String userId) {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new CustomException(ErrorCode.INVALID_USER_ID)
         );
@@ -64,9 +60,7 @@ public class ReviewService {
     }
 
     @Transactional
-    public ReviewDto writeReview(HttpHeaders headers, WriteReview request) {
-        String userId = tokenAuthenticator.resolveTokenFromHeader(headers);
-
+    public ReviewDto writeReview(String userId, WriteReview request) {
         Specification<Review> specification = Specification
                 .where(ReviewSpecification.userIdEquals(userId))
                 .and(ReviewSpecification.orderIdEquals(request.getOrderId()));
@@ -90,17 +84,12 @@ public class ReviewService {
     }
 
     @Transactional
-    public ReviewDto modifyReview(HttpHeaders headers, ModifyReview request) {
-        String userId = tokenAuthenticator.resolveTokenFromHeader(headers);
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new CustomException(ErrorCode.INVALID_USER_ID)
-        );
-
+    public ReviewDto modifyReview(String userId, ModifyReview request) {
         Review review = reviewRepository.findById(request.getId()).orElseThrow(
                 () -> new CustomException(ErrorCode.INVALID_REVIEW_ID)
         );
 
-        if (!Objects.equals(user.getId(), review.getUserId())) {
+        if (!Objects.equals(userId, review.getUserId())) {
             throw new CustomException(ErrorCode.USER_ID_NOT_SAME);
         }
 
@@ -112,8 +101,7 @@ public class ReviewService {
     }
 
     @Transactional
-    public void deleteReview(HttpHeaders headers, Long id) {
-        String userId = tokenAuthenticator.resolveTokenFromHeader(headers);
+    public void deleteReview(String userId, Long id) {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new CustomException(ErrorCode.INVALID_USER_ID)
         );

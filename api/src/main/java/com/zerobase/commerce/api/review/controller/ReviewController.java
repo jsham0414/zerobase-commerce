@@ -3,6 +3,7 @@ package com.zerobase.commerce.api.review.controller;
 import com.zerobase.commerce.api.review.dto.ModifyReview;
 import com.zerobase.commerce.api.review.dto.WriteReview;
 import com.zerobase.commerce.api.review.service.ReviewService;
+import com.zerobase.commerce.api.security.TokenAuthenticator;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -17,38 +18,43 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ReviewController {
     private final ReviewService reviewService;
+    private final TokenAuthenticator tokenAuthenticator;
 
-    @GetMapping("/{id}")
-    ResponseEntity<?> getReview(@NotNull(message = "Id must not be null") @PathVariable Long id) {
-        return ResponseEntity.ok(reviewService.getReview(id));
+    @GetMapping("/{reviewId}")
+    ResponseEntity<?> getReview(@NotNull(message = "reviewId must not be null") @PathVariable(name = "reviewId") Long reviewId) {
+        return ResponseEntity.ok(reviewService.getReview(reviewId));
     }
 
     @GetMapping("/self")
     ResponseEntity<?> getSelfReviews(@RequestHeader HttpHeaders headers) {
-        return ResponseEntity.ok(reviewService.getSelfReviews(headers));
+        String userId = tokenAuthenticator.resolveTokenFromHeader(headers);
+        return ResponseEntity.ok(reviewService.getSelfReviews(userId));
     }
 
-    @GetMapping("/product/{id}")
-    ResponseEntity<?> getProductReviews(@NotNull(message = "Product Id must not be null") @PathVariable UUID productId) {
+    @GetMapping("/product/{productId}")
+    ResponseEntity<?> getProductReviews(@NotNull(message = "productId must not be null") @PathVariable(name = "productId") UUID productId) {
         return ResponseEntity.ok(reviewService.getProductReviews(productId));
     }
 
     @PostMapping
     ResponseEntity<?> writeReview(@RequestHeader HttpHeaders headers,
                                   @Validated @RequestBody WriteReview request) {
-        return ResponseEntity.ok(reviewService.writeReview(headers, request));
+        String userId = tokenAuthenticator.resolveTokenFromHeader(headers);
+        return ResponseEntity.ok(reviewService.writeReview(userId, request));
     }
 
     @PutMapping
     ResponseEntity<?> modifyReview(@RequestHeader HttpHeaders headers,
                                    @Validated @RequestBody ModifyReview request) {
-        return ResponseEntity.ok(reviewService.modifyReview(headers, request));
+        String userId = tokenAuthenticator.resolveTokenFromHeader(headers);
+        return ResponseEntity.ok(reviewService.modifyReview(userId, request));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{reviewId}")
     ResponseEntity<?> deleteReview(@RequestHeader HttpHeaders headers,
-                                   @NotNull(message = "id must not be null") @PathVariable Long id) {
-        reviewService.deleteReview(headers, id);
+                                   @NotNull(message = "reviewId must not be null") @PathVariable(name = "reviewId") Long reviewId) {
+        String userId = tokenAuthenticator.resolveTokenFromHeader(headers);
+        reviewService.deleteReview(userId, reviewId);
         return ResponseEntity.ok(null);
     }
 }

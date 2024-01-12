@@ -3,6 +3,7 @@ package com.zerobase.commerce.api.product.controller;
 import com.zerobase.commerce.api.product.dto.AddProduct;
 import com.zerobase.commerce.api.product.dto.UpdateProduct;
 import com.zerobase.commerce.api.product.service.ProductService;
+import com.zerobase.commerce.api.security.TokenAuthenticator;
 import com.zerobase.commerce.api.validation.EnumCheck;
 import com.zerobase.commerce.database.product.constant.ProductSortFilter;
 import com.zerobase.commerce.database.product.constant.SortOrder;
@@ -22,17 +23,19 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ProductController {
     private final ProductService productService;
+    private final TokenAuthenticator tokenAuthenticator;
 
     @PreAuthorize("hasRole('ROLE_SELLER')")
     @PostMapping
     ResponseEntity<?> addProduct(@RequestHeader HttpHeaders headers,
                                  @Validated @RequestBody AddProduct request) {
-        return ResponseEntity.ok(productService.addProduct(headers, request));
+        String userId = tokenAuthenticator.resolveTokenFromHeader(headers);
+        return ResponseEntity.ok(productService.addProduct(userId, request));
     }
 
     @GetMapping("/{productId}")
     ResponseEntity<?> getProduct(
-            @NotNull(message = "id must not be blank") @PathVariable UUID productId) {
+            @NotNull(message = "productId must not be blank") @PathVariable(name = "productId") UUID productId) {
         return ResponseEntity.ok(productService.getProduct(productId));
     }
 
@@ -40,14 +43,16 @@ public class ProductController {
     @PutMapping
     ResponseEntity<?> updateProduct(@RequestHeader HttpHeaders headers,
                                     @Validated @RequestBody UpdateProduct request) {
-        return ResponseEntity.ok(productService.updateProduct(headers, request));
+        String userId = tokenAuthenticator.resolveTokenFromHeader(headers);
+        return ResponseEntity.ok(productService.updateProduct(userId, request));
     }
 
     @PreAuthorize("hasRole('ROLE_SELLER')")
     @DeleteMapping
     ResponseEntity<?> deleteProduct(@RequestHeader HttpHeaders headers,
                                     @NotNull(message = "Id is must not be null") @RequestBody UUID productId) {
-        productService.deleteProduct(headers, productId);
+        String userId = tokenAuthenticator.resolveTokenFromHeader(headers);
+        productService.deleteProduct(userId, productId);
         return ResponseEntity.ok(null);
     }
 
@@ -55,7 +60,8 @@ public class ProductController {
     @GetMapping("/seller")
     ResponseEntity<?> getProductsBySeller(
             @RequestHeader HttpHeaders headers) {
-        return ResponseEntity.ok(productService.getProductsBySeller(headers));
+        String userId = tokenAuthenticator.resolveTokenFromHeader(headers);
+        return ResponseEntity.ok(productService.getProductsBySeller(userId));
     }
 
     @GetMapping

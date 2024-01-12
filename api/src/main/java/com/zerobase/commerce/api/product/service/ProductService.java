@@ -6,7 +6,6 @@ import com.zerobase.commerce.api.product.dto.AddProduct;
 import com.zerobase.commerce.api.product.dto.ProductDto;
 import com.zerobase.commerce.api.product.dto.ProductRanking;
 import com.zerobase.commerce.api.product.dto.UpdateProduct;
-import com.zerobase.commerce.api.security.TokenAuthenticator;
 import com.zerobase.commerce.database.product.constant.ProductSortFilter;
 import com.zerobase.commerce.database.product.constant.ProductStatus;
 import com.zerobase.commerce.database.product.constant.SortOrder;
@@ -15,7 +14,6 @@ import com.zerobase.commerce.database.product.repository.ProductRepository;
 import com.zerobase.commerce.database.product.repository.specification.ProductSpecification;
 import com.zerobase.commerce.database.review.domain.Review;
 import com.zerobase.commerce.database.review.repository.ReviewRepository;
-import com.zerobase.commerce.database.user.domain.User;
 import com.zerobase.commerce.database.user.repository.UserRepository;
 import com.zerobase.commerce.database.wishlist.repository.WishlistRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +21,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
-import org.springframework.http.HttpHeaders;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,7 +34,6 @@ import static com.zerobase.commerce.database.product.constant.SortOrder.ASC;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class ProductService {
-    private final TokenAuthenticator tokenAuthenticator;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final ReviewRepository reviewRepository;
@@ -97,9 +93,7 @@ public class ProductService {
     }
 
     @Transactional
-    public ProductDto addProduct(HttpHeaders headers, AddProduct request) {
-        String userId = tokenAuthenticator.resolveTokenFromHeader(headers);
-
+    public ProductDto addProduct(String sellerId, AddProduct request) {
         LocalDateTime now = LocalDateTime.now();
 
         ProductStatus status;
@@ -111,7 +105,7 @@ public class ProductService {
 
         Product product = Product.builder()
                 .name(request.getName())
-                .sellerId(userId)
+                .sellerId(sellerId)
                 .price(request.getPrice())
                 .status(status)
                 .discount(0.0)
@@ -140,17 +134,12 @@ public class ProductService {
     }
 
     @Transactional
-    public ProductDto updateProduct(HttpHeaders headers, UpdateProduct request) {
-        String id = tokenAuthenticator.resolveTokenFromHeader(headers);
-        User user = userRepository.findById(id).orElseThrow(
-                () -> new CustomException(ErrorCode.INVALID_USER_ID)
-        );
-
+    public ProductDto updateProduct(String sellerId, UpdateProduct request) {
         Product product = productRepository.findById(request.getId()).orElseThrow(
                 () -> new CustomException(ErrorCode.INVALID_PRODUCT_ID)
         );
 
-        if (!Objects.equals(product.getSellerId(), user.getId())) {
+        if (!Objects.equals(product.getSellerId(), sellerId)) {
             throw new CustomException(ErrorCode.SELLER_ID_NOT_SAME);
         }
 
@@ -175,17 +164,12 @@ public class ProductService {
     }
 
     @Transactional
-    public void deleteProduct(HttpHeaders headers, UUID productId) {
-        String id = tokenAuthenticator.resolveTokenFromHeader(headers);
-        User user = userRepository.findById(id).orElseThrow(
-                () -> new CustomException(ErrorCode.INVALID_USER_ID)
-        );
-
+    public void deleteProduct(String sellerId, UUID productId) {
         Product product = productRepository.findById(productId).orElseThrow(
                 () -> new CustomException(ErrorCode.INVALID_PRODUCT_ID)
         );
 
-        if (!Objects.equals(product.getSellerId(), user.getId())) {
+        if (!Objects.equals(product.getSellerId(), sellerId)) {
             throw new CustomException(ErrorCode.SELLER_ID_NOT_SAME);
         }
 
@@ -198,11 +182,9 @@ public class ProductService {
         product.setStatus(ProductStatus.DELETED);
     }
 
-    public List<ProductDto> getProductsBySeller(HttpHeaders headers) {
-        String id = tokenAuthenticator.resolveTokenFromHeader(headers);
-
+    public List<ProductDto> getProductsBySeller(String sellerId) {
         Specification<Product> specification = Specification
-                .where(ProductSpecification.sellerIdEquals(id))
+                .where(ProductSpecification.sellerIdEquals(sellerId))
                 .and(ProductSpecification.notDeleted())
                 .and(ProductSpecification.orderByUpdatedAtDesc());
 

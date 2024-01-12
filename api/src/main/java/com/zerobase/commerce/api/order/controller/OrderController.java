@@ -1,6 +1,7 @@
 package com.zerobase.commerce.api.order.controller;
 
 import com.zerobase.commerce.api.order.service.OrderService;
+import com.zerobase.commerce.api.security.TokenAuthenticator;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -15,44 +16,56 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class OrderController {
     private final OrderService orderService;
+    private final TokenAuthenticator tokenAuthenticator;
 
-    @GetMapping("/{id}")
+    @GetMapping("/{orderId}")
     ResponseEntity<?> getOrder(@RequestHeader HttpHeaders headers,
-                               @NotNull(message = "Order Id is must not be null") @PathVariable UUID id) {
-        return ResponseEntity.ok(orderService.getOrder(headers, id));
+                               @NotNull(message = "orderId is must not be null") @PathVariable(name = "orderId") UUID orderId) {
+        String userId = tokenAuthenticator.resolveTokenFromHeader(headers);
+        return ResponseEntity.ok(orderService.getOrder(userId, orderId));
     }
 
     @PreAuthorize("hasRole('ROLE_SELLER')")
-    @PutMapping("/approve/{id}")
+    @PutMapping("/{orderId}/approve")
     ResponseEntity<?> approveOrder(@RequestHeader HttpHeaders headers,
-                                   @NotNull(message = "Order Id is must not be null") @PathVariable UUID id) {
-        return ResponseEntity.ok(orderService.approveOrder(headers, id));
+                                   @NotNull(message = "orderId is must not be null") @PathVariable(name = "orderId") UUID orderId) {
+        String userId = tokenAuthenticator.resolveTokenFromHeader(headers);
+        return ResponseEntity.ok(orderService.approveOrder(userId, orderId));
     }
 
-    @PutMapping("/cancel/{id}")
+    @PutMapping("{orderId}/cancel")
     ResponseEntity<?> cancelOrder(@RequestHeader HttpHeaders headers,
-                                  @NotNull(message = "Order Id is must not be null") @PathVariable UUID id) {
-        return ResponseEntity.ok(orderService.cancelOrder(headers, id));
+                                  @NotNull(message = "orderId is must not be null") @PathVariable(name = "orderId") UUID orderId) {
+        String userId = tokenAuthenticator.resolveTokenFromHeader(headers);
+        return ResponseEntity.ok(orderService.cancelOrder(userId, orderId));
     }
 
     @PreAuthorize("hasRole('ROLE_SELLER')")
-    @PutMapping("/reject/{id}")
+    @PutMapping("/{orderId}/reject")
     ResponseEntity<?> rejectOrder(@RequestHeader HttpHeaders headers,
-                                  @NotNull(message = "Order Id is must not be null") @PathVariable UUID id) {
-        return ResponseEntity.ok(orderService.rejectOrder(headers, id));
+                                  @NotNull(message = "orderId is must not be null") @PathVariable(name = "orderId") UUID orderId) {
+        String userId = tokenAuthenticator.resolveTokenFromHeader(headers);
+        return ResponseEntity.ok(orderService.rejectOrder(userId, orderId));
     }
 
     @GetMapping("/self")
     ResponseEntity<?> getOrdersByUser(@RequestHeader HttpHeaders headers) {
-        return ResponseEntity.ok(orderService.getOrdersByUser(headers));
+        String userId = tokenAuthenticator.resolveTokenFromHeader(headers);
+        return ResponseEntity.ok(orderService.getOrdersByUser(userId));
     }
 
     @PreAuthorize("hasRole('ROLE_SELLER')")
-    @GetMapping("/product/{id}")
+    @GetMapping("/product/{productId}")
     ResponseEntity<?> getOrdersByProduct(@RequestHeader HttpHeaders headers,
-                                         @NotNull(message = "Product id must not be null") @PathVariable UUID id) {
-        return ResponseEntity.ok(orderService.getOrdersByProduct(headers, id));
+                                         @NotNull(message = "productId must not be null") @PathVariable(name = "productId") UUID productId) {
+        String userId = tokenAuthenticator.resolveTokenFromHeader(headers);
+        return ResponseEntity.ok(orderService.getOrdersByProduct(userId, productId));
     }
 
+    @PostMapping
+    ResponseEntity<?> purchase(@RequestHeader HttpHeaders headers) {
+        String userId = tokenAuthenticator.resolveTokenFromHeader(headers);
+        return ResponseEntity.ok(orderService.purchase(userId));
+    }
 
 }
