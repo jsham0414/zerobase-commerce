@@ -4,6 +4,7 @@ import com.zerobase.commerce.database.order.constant.OrderStatus;
 import com.zerobase.commerce.database.order.constant.converter.OrderStatusConverter;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -39,6 +40,7 @@ public class Order {
     @Convert(converter = OrderStatusConverter.class)
     private OrderStatus status;
 
+    @CreatedDate
     @Column(name = "purchased_at")
     private LocalDateTime purchasedAt;
 }

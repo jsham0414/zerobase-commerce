@@ -1,7 +1,6 @@
 package com.zerobase.commerce.api.order.controller;
 
 import com.zerobase.commerce.api.order.service.OrderService;
-import com.zerobase.commerce.database.order.repository.OrderRepository;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -45,14 +44,14 @@ public class OrderController {
 
     @GetMapping("/self")
     ResponseEntity<?> getOrdersByUser(@RequestHeader HttpHeaders headers) {
-        return ResponseEntity.ok(orderService.getOrders(headers));
+        return ResponseEntity.ok(orderService.getOrdersByUser(headers));
     }
 
     @PreAuthorize("hasRole('ROLE_SELLER')")
     @GetMapping("/product/{id}")
-    ResponseEntity<?> getOrdersByProductId(@RequestHeader HttpHeaders headers,
-                                           @NotNull(message = "Product id must not be null") @PathVariable UUID id) {
-        return ResponseEntity.ok(orderService.getOrders(headers));
+    ResponseEntity<?> getOrdersByProduct(@RequestHeader HttpHeaders headers,
+                                         @NotNull(message = "Product id must not be null") @PathVariable UUID id) {
+        return ResponseEntity.ok(orderService.getOrdersByProduct(headers, id));
     }
 
 

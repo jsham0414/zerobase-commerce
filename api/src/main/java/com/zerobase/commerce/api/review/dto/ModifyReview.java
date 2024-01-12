@@ -1,12 +1,8 @@
 package com.zerobase.commerce.api.review.dto;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import org.hibernate.validator.constraints.Range;
-
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Getter
 public class ModifyReview {

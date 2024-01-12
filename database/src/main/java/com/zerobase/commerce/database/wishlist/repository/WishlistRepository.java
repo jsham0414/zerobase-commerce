@@ -8,7 +8,9 @@ import java.util.UUID;
 
 public interface WishlistRepository extends JpaRepository<Wishlist, Long> {
     List<Wishlist> findByUserIdOrderByAddedAtDesc(String userId);
+
     List<Wishlist> findByUserId(String userId);
+
     void deleteAllByUserId(String userId);
 
     void deleteAllByProductId(UUID productId);

@@ -2,9 +2,6 @@ package com.zerobase.commerce.api.order.dto;
 
 import com.zerobase.commerce.database.order.constant.OrderStatus;
 import com.zerobase.commerce.database.order.domain.Order;
-import jakarta.persistence.Column;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDateTime;

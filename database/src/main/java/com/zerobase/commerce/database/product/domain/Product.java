@@ -4,6 +4,8 @@ import com.zerobase.commerce.database.product.constant.ProductStatus;
 import com.zerobase.commerce.database.product.constant.converter.ProductStatusConverter;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -40,9 +42,11 @@ public class Product {
     @Column(name = "star")
     private Double star;
 
+    @CreatedDate
     @Column(name = "published_at")
     private LocalDateTime publishedAt;
 
+    @LastModifiedDate
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 }

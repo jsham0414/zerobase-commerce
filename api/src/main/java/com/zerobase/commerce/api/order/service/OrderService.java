@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.concurrent.RejectedExecutionException;
 
 @Service
 @RequiredArgsConstructor
@@ -167,7 +166,7 @@ public class OrderService {
             throw new CustomException(ErrorCode.SELLER_ID_NOT_SAME);
         }
 
-        return orderRepository.findByProductIdOrderByPurchasedAtDesc(userId)
+        return orderRepository.findByProductIdOrderByPurchasedAtDesc(id)
                 .stream()
                 .map(OrderDto::fromEntity)
                 .toList();

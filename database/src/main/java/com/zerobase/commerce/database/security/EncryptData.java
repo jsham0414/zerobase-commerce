@@ -7,9 +7,6 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,7 +16,6 @@ import java.util.Optional;
 @Aspect
 @Component
 @RequiredArgsConstructor
-@Order(Ordered.HIGHEST_PRECEDENCE)
 @Slf4j
 public class EncryptData {
     private final EncryptString encryptString;
@@ -33,7 +29,7 @@ public class EncryptData {
     private void isFind() {
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     @Around("isSave()")
     Object encrypt(ProceedingJoinPoint joinPoint) throws Throwable {
         var target = joinPoint.getArgs()[0];
@@ -52,7 +48,6 @@ public class EncryptData {
                 }
             } catch (IllegalAccessException e) {
                 log.error("{}", e.getCause().toString());
-                throw e;
             } finally {
                 field.setAccessible(false);
             }
@@ -61,7 +56,7 @@ public class EncryptData {
         return joinPoint.proceed(joinPoint.getArgs());
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     @Around("isFind()")
     Object decrypt(ProceedingJoinPoint joinPoint) throws Throwable {
         var targetData = joinPoint.proceed(joinPoint.getArgs());
@@ -80,32 +75,30 @@ public class EncryptData {
             target = targetData;
         }
 
-        boolean hasEncrypt = false;
+        boolean detached = false;
         var fields = target.getClass().getDeclaredFields();
         for (Field field : fields) {
             if (!field.isAnnotationPresent(Encrypt.class))
                 continue;
-
-            hasEncrypt = true;
 
             field.setAccessible(true);
             try {
                 Object data = field.get(target);
 
                 if (data instanceof String) {
+                    if (!detached)
+                        entityManager.detach(target);
+                    detached = true;
+
                     field.set(target, encryptString.decryptString(String.valueOf(data)));
                 }
 
-            } catch (IllegalArgumentException e) {
+            } catch (RuntimeException e) {
                 log.error("{}", e.getCause().toString());
-                throw e;
             } finally {
                 field.setAccessible(false);
             }
         }
-
-        if (hasEncrypt)
-            entityManager.refresh(target);
 
         return targetData;
     }

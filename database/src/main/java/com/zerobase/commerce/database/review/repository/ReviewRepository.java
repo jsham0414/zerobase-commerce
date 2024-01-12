@@ -9,5 +9,6 @@ import java.util.UUID;
 
 public interface ReviewRepository extends JpaRepository<Review, Long>, JpaSpecificationExecutor<Review> {
     List<Review> findByProductId(UUID productId);
+
     List<Review> findByUserId(String userId);
 }

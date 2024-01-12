@@ -1,9 +1,11 @@
 package com.zerobase.commerce.api.exception;
 
 import lombok.Getter;
+import lombok.ToString;
 import org.springframework.http.HttpStatus;
 
 @Getter
+@ToString
 public enum ErrorCode {
     UNEXPECTED_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error occurred."),
     USER_ID_DUPLICATED(HttpStatus.BAD_REQUEST, "ID duplicated. Please enter a different ID."),

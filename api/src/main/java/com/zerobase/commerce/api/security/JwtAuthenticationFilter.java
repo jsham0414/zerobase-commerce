@@ -1,5 +1,6 @@
 package com.zerobase.commerce.api.security;
 
+import com.zerobase.commerce.api.exception.CustomException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,7 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain
-    ) throws ServletException, IOException {
+    ) throws ServletException, IOException, CustomException {
         String tokenExcludedHeader = resolveTokenFromRequest(request);
 
         if (StringUtils.hasText(tokenExcludedHeader) && tokenAuthenticator.validateToken(tokenExcludedHeader)) {

@@ -19,8 +19,8 @@ import com.zerobase.commerce.database.user.domain.User;
 import com.zerobase.commerce.database.user.repository.UserRepository;
 import com.zerobase.commerce.database.wishlist.repository.WishlistRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.http.HttpHeaders;
@@ -30,7 +30,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.zerobase.commerce.database.product.constant.SortOrder.ASC;
 
@@ -48,14 +47,12 @@ public class ProductService {
     private final String starKey = "star";
 
     @Transactional
-    @Scheduled(cron = "${scheduler.review.update}")
+    @Scheduled(cron = "${scheduler.review.test_update}")
     void updateStar() throws InterruptedException {
         List<Product> products = productRepository.findAll();
 
         for (Product product : products) {
             double sum = 0.0;
-
-
 
             List<Review> reviews = reviewRepository.findByProductId(product.getId());
             if (reviews.isEmpty()) {
@@ -69,10 +66,15 @@ public class ProductService {
             product.setStar(sum / reviews.size());
 
             String key = String.format("%s:%s", product.getId(), product.getName());
-            if (product.getStatus() != ProductStatus.PUBLIC && redisTemplate.boundZSetOps(starKey).score(key) != null) {
-                redisTemplate.opsForZSet().remove(starKey, key);
-            } else if (product.getStatus() == ProductStatus.PUBLIC) {
-                redisTemplate.opsForZSet().add(starKey, key, product.getStar());
+
+            try {
+                if (product.getStatus() != ProductStatus.PUBLIC && redisTemplate.boundZSetOps(starKey).score(key) != null) {
+                    redisTemplate.opsForZSet().remove(starKey, key);
+                } else if (product.getStatus() == ProductStatus.PUBLIC) {
+                    redisTemplate.opsForZSet().add(starKey, key, product.getStar());
+                }
+            } catch (RedisConnectionFailureException e) {
+                e.printStackTrace();
             }
 
             productRepository.save(product);

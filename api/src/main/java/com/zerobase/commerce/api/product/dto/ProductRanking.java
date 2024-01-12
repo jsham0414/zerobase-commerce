@@ -1,7 +1,5 @@
 package com.zerobase.commerce.api.product.dto;
 
-import com.zerobase.commerce.database.product.domain.Product;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.springframework.data.redis.core.ZSetOperations;
 

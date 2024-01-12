@@ -2,12 +2,10 @@ package com.zerobase.commerce.api.review.service;
 
 import com.zerobase.commerce.api.exception.CustomException;
 import com.zerobase.commerce.api.exception.ErrorCode;
-import com.zerobase.commerce.api.product.dto.ProductDto;
 import com.zerobase.commerce.api.review.dto.ModifyReview;
 import com.zerobase.commerce.api.review.dto.ReviewDto;
 import com.zerobase.commerce.api.review.dto.WriteReview;
 import com.zerobase.commerce.api.security.TokenAuthenticator;
-import com.zerobase.commerce.database.product.domain.Product;
 import com.zerobase.commerce.database.product.repository.ProductRepository;
 import com.zerobase.commerce.database.review.domain.Review;
 import com.zerobase.commerce.database.review.repository.ReviewRepository;
@@ -16,9 +14,7 @@ import com.zerobase.commerce.database.user.domain.User;
 import com.zerobase.commerce.database.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpHeaders;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

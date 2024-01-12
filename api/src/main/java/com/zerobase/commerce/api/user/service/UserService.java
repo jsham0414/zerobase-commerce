@@ -1,5 +1,6 @@
 package com.zerobase.commerce.api.user.service;
 
+import com.zerobase.commerce.api.constant.CacheKey;
 import com.zerobase.commerce.api.exception.CustomException;
 import com.zerobase.commerce.api.exception.ErrorCode;
 import com.zerobase.commerce.api.security.TokenAuthenticator;
@@ -9,12 +10,14 @@ import com.zerobase.commerce.database.user.constant.AuthorityStatus;
 import com.zerobase.commerce.database.user.domain.User;
 import com.zerobase.commerce.database.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +25,7 @@ import java.util.Objects;
 public class UserService {
     private final UserRepository userRepository;
     private final TokenAuthenticator tokenAuthenticator;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     public UserDto getUserInfo(HttpHeaders headers, String password) {
         String id = tokenAuthenticator.resolveTokenFromHeader(headers);
@@ -53,9 +57,9 @@ public class UserService {
 
         user.setUpdatedAt(LocalDateTime.now());
 
-        userRepository.save(user);
+        redisTemplate.opsForValue().set(CacheKey.KEY_USER + ":" + user.getId(), user, 600, TimeUnit.SECONDS);
 
-        return UserDto.fromEntity(user);
+        return UserDto.fromEntity(userRepository.save(user));
     }
 
     @Transactional
@@ -67,6 +71,8 @@ public class UserService {
 
         if (!Objects.equals(user.getPassword(), password))
             throw new CustomException(ErrorCode.PASSWORD_INCORRECT);
+
+        redisTemplate.opsForValue().getAndDelete(CacheKey.KEY_USER + ":" + user.getId());
 
         userRepository.delete(user);
     }

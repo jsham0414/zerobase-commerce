@@ -2,6 +2,7 @@ package com.zerobase.commerce.database.wishlist.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -27,6 +28,7 @@ public class Wishlist {
     @Column(name = "amount")
     private Long amount;
 
+    @CreatedDate
     @Column(name = "added_at")
     private LocalDateTime addedAt;
 }

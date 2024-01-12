@@ -2,13 +2,10 @@ package com.zerobase.commerce.api.wishlist.service;
 
 import com.zerobase.commerce.api.exception.CustomException;
 import com.zerobase.commerce.api.exception.ErrorCode;
-import com.zerobase.commerce.api.order.dto.OrderDto;
 import com.zerobase.commerce.api.security.TokenAuthenticator;
 import com.zerobase.commerce.api.wishlist.dto.AddWishlist;
 import com.zerobase.commerce.api.wishlist.dto.UpdateWishlist;
 import com.zerobase.commerce.api.wishlist.dto.WishlistDto;
-import com.zerobase.commerce.database.order.constant.OrderStatus;
-import com.zerobase.commerce.database.order.domain.Order;
 import com.zerobase.commerce.database.order.repository.OrderRepository;
 import com.zerobase.commerce.database.product.constant.ProductStatus;
 import com.zerobase.commerce.database.product.domain.Product;
@@ -23,10 +20,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
