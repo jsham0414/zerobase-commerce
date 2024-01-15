@@ -3,7 +3,6 @@ package com.zerobase.commerce.api.product.dto;
 import com.zerobase.commerce.api.validation.EnumCheck;
 import com.zerobase.commerce.database.product.constant.ProductStatus;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.validator.constraints.Range;
@@ -18,9 +17,6 @@ import java.util.UUID;
 public class UpdateProduct {
     @NotNull(message = "Id is must not be null")
     private UUID id;
-
-    @NotBlank(message = "SellerId is must not be blank")
-    private String sellerId;
 
     private String name;
 

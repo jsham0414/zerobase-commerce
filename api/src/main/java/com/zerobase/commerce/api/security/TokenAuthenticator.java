@@ -7,6 +7,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,6 +19,7 @@ import java.util.Date;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class TokenAuthenticator {
     private final AuthService authService;
     private final String TOKEN_HEADER = "Authorization";
@@ -56,8 +58,9 @@ public class TokenAuthenticator {
     public String resolveTokenFromHeader(HttpHeaders headers) {
         String token = headers.getFirst(TOKEN_HEADER);
 
-        if (token == null || token.isEmpty() || !token.startsWith(tokenPrefix))
+        if (token == null || token.isEmpty() || !token.startsWith(tokenPrefix)) {
             throw new CustomException(ErrorCode.INVALID_TOKEN);
+        }
 
         return getId(token.substring(tokenPrefix.length()));
     }

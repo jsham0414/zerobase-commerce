@@ -10,13 +10,16 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.nio.file.AccessDeniedException;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class ExceptionHandlerFilter extends OncePerRequestFilter {
     private final ObjectMapper objectMapper;
 
@@ -29,8 +32,9 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } catch (CustomException e) {
             writeErrorResponse(response, e);
+        } catch (AccessDeniedException e) {
+            writeErrorResponse(response, new CustomException(ErrorCode.NO_PERMISSION));
         } catch (RuntimeException e) {
-            e.printStackTrace();
             writeErrorResponse(response, new CustomException(ErrorCode.UNEXPECTED_ERROR));
         }
     }
@@ -41,5 +45,8 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
         response.setStatus(e.getErrorCode().getStatusCode().value());
         response.setContentType("application/json");
         response.getWriter().write(errorJson);
+
+        log.info(e.getMessage());
     }
+
 }

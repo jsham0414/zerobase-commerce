@@ -13,6 +13,7 @@ import com.zerobase.commerce.database.user.repository.UserRepository;
 import com.zerobase.commerce.database.wishlist.domain.Wishlist;
 import com.zerobase.commerce.database.wishlist.repository.WishlistRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -128,14 +129,14 @@ public class OrderService {
         return OrderDto.fromEntity(order);
     }
 
-    public List<OrderDto> getOrdersByUser(String userId) {
-        return orderRepository.findByUserIdOrderByPurchasedAtDesc(userId)
+    public List<OrderDto> getOrdersByUser(String userId, Pageable pageable) {
+        return orderRepository.findByUserIdOrderByPurchasedAtDesc(userId, pageable)
                 .stream()
                 .map(OrderDto::fromEntity)
                 .toList();
     }
 
-    public List<OrderDto> getOrdersByProduct(String sellerId, UUID id) {
+    public List<OrderDto> getOrdersByProduct(String sellerId, UUID id, Pageable pageable) {
         Product product = productRepository.findById(id).orElseThrow(
                 () -> new CustomException(ErrorCode.INVALID_PRODUCT_ID)
         );
@@ -144,7 +145,7 @@ public class OrderService {
             throw new CustomException(ErrorCode.SELLER_ID_NOT_SAME);
         }
 
-        return orderRepository.findByProductIdOrderByPurchasedAtDesc(id)
+        return orderRepository.findByProductIdOrderByPurchasedAtDesc(id, pageable)
                 .stream()
                 .map(OrderDto::fromEntity)
                 .toList();
@@ -156,7 +157,7 @@ public class OrderService {
             throw new CustomException(ErrorCode.INVALID_USER_ID);
         }
 
-        List<Wishlist> wishlists = wishlistRepository.findByUserId(userId);
+        List<Wishlist> wishlists = wishlistRepository.findByUserId(userId, Pageable.unpaged());
         List<OrderDto> orders = new ArrayList<>();
 
         for (Wishlist w : wishlists) {
@@ -166,6 +167,9 @@ public class OrderService {
 
             if (p.getStatus() == ProductStatus.PRIVATE)
                 throw new CustomException(ErrorCode.PRIVATE_PRODUCT);
+
+            if (p.getStatus() == ProductStatus.DELETED)
+                throw new CustomException(ErrorCode.DELETED_PRODUCT);
 
             Order order = orderRepository.save(Order.builder()
                     .userId(userId)

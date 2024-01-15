@@ -9,6 +9,10 @@ public class ProductSpecification {
         return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("name"), name);
     }
 
+    public static Specification<Product> nameLikes(String name) {
+        return (root, query, criteriaBuilder) -> criteriaBuilder.like(root.get("name"), '%' + name + '%');
+    }
+
     public static Specification<Product> publicOnly() {
         return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("status"), ProductStatus.PUBLIC.name());
     }

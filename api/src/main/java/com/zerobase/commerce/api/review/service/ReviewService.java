@@ -12,6 +12,7 @@ import com.zerobase.commerce.database.review.repository.specification.ReviewSpec
 import com.zerobase.commerce.database.user.domain.User;
 import com.zerobase.commerce.database.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,23 +38,23 @@ public class ReviewService {
         return ReviewDto.fromEntity(review);
     }
 
-    public List<ReviewDto> getSelfReviews(String userId) {
+    public List<ReviewDto> getSelfReviews(String userId, Pageable pageable) {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new CustomException(ErrorCode.INVALID_USER_ID)
         );
 
-        return reviewRepository.findByUserId(user.getId())
+        return reviewRepository.findByUserId(user.getId(), pageable)
                 .stream()
                 .map(ReviewDto::fromEntity)
                 .toList();
     }
 
-    public List<ReviewDto> getProductReviews(UUID productId) {
+    public List<ReviewDto> getProductReviews(UUID productId, Pageable pageable) {
         if (!productRepository.existsById(productId)) {
             throw new CustomException(ErrorCode.INVALID_PRODUCT_ID);
         }
 
-        return reviewRepository.findByProductId(productId)
+        return reviewRepository.findByProductId(productId, pageable)
                 .stream()
                 .map(ReviewDto::fromEntity)
                 .toList();
@@ -102,15 +103,11 @@ public class ReviewService {
 
     @Transactional
     public void deleteReview(String userId, Long id) {
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new CustomException(ErrorCode.INVALID_USER_ID)
-        );
-
         Review review = reviewRepository.findById(id).orElseThrow(
                 () -> new CustomException(ErrorCode.INVALID_REVIEW_ID)
         );
 
-        if (!Objects.equals(user.getId(), review.getUserId())) {
+        if (!Objects.equals(userId, review.getUserId())) {
             throw new CustomException(ErrorCode.USER_ID_NOT_SAME);
         }
 
