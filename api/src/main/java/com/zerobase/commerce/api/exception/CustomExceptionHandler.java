@@ -12,13 +12,19 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class CustomExceptionHandler {
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<?> customExceptionHandler(CustomException e) {
+        log.info("{} : {}", e.getErrorCode().getErrorCode(), e.getErrorCode().getErrorMessage());
+
         return new ErrorResponse(e).toResponseEntity();
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> validationException(MethodArgumentNotValidException e) {
         var errorMessages = e.getBindingResult().getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList();
-        return new ErrorResponse(new CustomException(ErrorCode.VALIDATION_ERROR)).toResponseEntity(String.join(", ", errorMessages) + ".");
+        var errorResponse = new ErrorResponse(new CustomException(ErrorCode.VALIDATION_ERROR)).toResponseEntity(String.join(", ", errorMessages) + ".");
+
+        log.info("{}", errorResponse.getBody());
+
+        return errorResponse;
     }
 
     @ExceptionHandler(RuntimeException.class)

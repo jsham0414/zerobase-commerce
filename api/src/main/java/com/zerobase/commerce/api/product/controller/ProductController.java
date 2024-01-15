@@ -1,15 +1,14 @@
 package com.zerobase.commerce.api.product.controller;
 
 import com.zerobase.commerce.api.product.dto.AddProduct;
+import com.zerobase.commerce.api.product.dto.SearchProductByName;
 import com.zerobase.commerce.api.product.dto.UpdateProduct;
 import com.zerobase.commerce.api.product.service.ProductService;
 import com.zerobase.commerce.api.security.TokenAuthenticator;
-import com.zerobase.commerce.api.validation.EnumCheck;
-import com.zerobase.commerce.database.product.constant.ProductSortFilter;
-import com.zerobase.commerce.database.product.constant.SortOrder;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -48,9 +47,9 @@ public class ProductController {
     }
 
     @PreAuthorize("hasRole('ROLE_SELLER')")
-    @DeleteMapping
+    @DeleteMapping("/{productId}")
     ResponseEntity<?> deleteProduct(@RequestHeader HttpHeaders headers,
-                                    @NotNull(message = "Id is must not be null") @RequestBody UUID productId) {
+                                    @NotNull(message = "Id is must not be null") @PathVariable(name = "productId") UUID productId) {
         String userId = tokenAuthenticator.resolveTokenFromHeader(headers);
         productService.deleteProduct(userId, productId);
         return ResponseEntity.ok(null);
@@ -58,17 +57,16 @@ public class ProductController {
 
     @PreAuthorize("hasRole('ROLE_SELLER')")
     @GetMapping("/seller")
-    ResponseEntity<?> getProductsBySeller(
-            @RequestHeader HttpHeaders headers) {
+    ResponseEntity<?> getProductsBySeller(@RequestHeader HttpHeaders headers,
+                                          @PageableDefault Pageable pageable) {
         String userId = tokenAuthenticator.resolveTokenFromHeader(headers);
-        return ResponseEntity.ok(productService.getProductsBySeller(userId));
+        return ResponseEntity.ok(productService.getProductsBySeller(userId, pageable));
     }
 
     @GetMapping
-    ResponseEntity<?> getProducts(@NotBlank(message = "Name is must not be blank") @RequestParam String name,
-                                  @EnumCheck(check = ProductSortFilter.class, message = "") @RequestParam(required = false) String filter,
-                                  @EnumCheck(check = SortOrder.class, message = "") @RequestParam(required = false) String order) {
-        return ResponseEntity.ok(productService.getProductsByName(name, filter, order));
+    ResponseEntity<?> getProducts(@RequestBody SearchProductByName searchProductByName,
+                                  @PageableDefault Pageable pageable) {
+        return ResponseEntity.ok(productService.getProductsByName(searchProductByName, pageable));
     }
 
     @GetMapping("/ranking")

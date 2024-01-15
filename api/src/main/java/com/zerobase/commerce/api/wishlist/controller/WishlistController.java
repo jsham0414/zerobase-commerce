@@ -6,6 +6,8 @@ import com.zerobase.commerce.api.wishlist.dto.UpdateWishlist;
 import com.zerobase.commerce.api.wishlist.service.WishlistService;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -26,17 +28,17 @@ public class WishlistController {
     }
 
     @GetMapping
-    ResponseEntity<?> getWishlist(@RequestHeader HttpHeaders headers) {
+    ResponseEntity<?> getWishlist(@RequestHeader HttpHeaders headers,
+                                  @PageableDefault Pageable pageable) {
         String userId = tokenAuthenticator.resolveTokenFromHeader(headers);
-        return ResponseEntity.ok(wishlistService.getWishlist(userId));
+        return ResponseEntity.ok(wishlistService.getWishlist(userId, pageable));
     }
 
-    @PutMapping("/{wishlistId}")
+    @PutMapping
     ResponseEntity<?> updateWishlist(@RequestHeader HttpHeaders headers,
-                                     @NotNull(message = "wishlistId must not be null") @PathVariable(name = "wishlistId") Long wishlistId,
                                      @Validated @RequestBody UpdateWishlist request) {
         String userId = tokenAuthenticator.resolveTokenFromHeader(headers);
-        return ResponseEntity.ok(wishlistService.updateWishlist(userId, wishlistId, request));
+        return ResponseEntity.ok(wishlistService.updateWishlist(userId, request));
     }
 
     @DeleteMapping("/{wishlistId}")

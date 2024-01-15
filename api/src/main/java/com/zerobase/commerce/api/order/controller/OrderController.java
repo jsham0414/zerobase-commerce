@@ -4,6 +4,8 @@ import com.zerobase.commerce.api.order.service.OrderService;
 import com.zerobase.commerce.api.security.TokenAuthenticator;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -49,17 +51,19 @@ public class OrderController {
     }
 
     @GetMapping("/self")
-    ResponseEntity<?> getOrdersByUser(@RequestHeader HttpHeaders headers) {
+    ResponseEntity<?> getOrdersByUser(@RequestHeader HttpHeaders headers,
+                                      @PageableDefault Pageable pageable) {
         String userId = tokenAuthenticator.resolveTokenFromHeader(headers);
-        return ResponseEntity.ok(orderService.getOrdersByUser(userId));
+        return ResponseEntity.ok(orderService.getOrdersByUser(userId, pageable));
     }
 
     @PreAuthorize("hasRole('ROLE_SELLER')")
     @GetMapping("/product/{productId}")
     ResponseEntity<?> getOrdersByProduct(@RequestHeader HttpHeaders headers,
-                                         @NotNull(message = "productId must not be null") @PathVariable(name = "productId") UUID productId) {
+                                         @NotNull(message = "productId must not be null") @PathVariable(name = "productId") UUID productId,
+                                         @PageableDefault Pageable pageable) {
         String userId = tokenAuthenticator.resolveTokenFromHeader(headers);
-        return ResponseEntity.ok(orderService.getOrdersByProduct(userId, productId));
+        return ResponseEntity.ok(orderService.getOrdersByProduct(userId, productId, pageable));
     }
 
     @PostMapping

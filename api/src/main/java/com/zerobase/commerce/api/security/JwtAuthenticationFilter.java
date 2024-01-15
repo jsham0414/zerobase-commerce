@@ -15,6 +15,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.nio.file.AccessDeniedException;
 
 @Component
 @RequiredArgsConstructor
@@ -30,7 +31,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain
-    ) throws ServletException, IOException, CustomException {
+    ) throws ServletException, IOException, CustomException, AccessDeniedException {
         String tokenExcludedHeader = resolveTokenFromRequest(request);
 
         if (StringUtils.hasText(tokenExcludedHeader) && tokenAuthenticator.validateToken(tokenExcludedHeader)) {

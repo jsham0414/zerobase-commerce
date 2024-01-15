@@ -2,10 +2,7 @@ package com.zerobase.commerce.api.product.service;
 
 import com.zerobase.commerce.api.exception.CustomException;
 import com.zerobase.commerce.api.exception.ErrorCode;
-import com.zerobase.commerce.api.product.dto.AddProduct;
-import com.zerobase.commerce.api.product.dto.ProductDto;
-import com.zerobase.commerce.api.product.dto.ProductRanking;
-import com.zerobase.commerce.api.product.dto.UpdateProduct;
+import com.zerobase.commerce.api.product.dto.*;
 import com.zerobase.commerce.database.product.constant.ProductSortFilter;
 import com.zerobase.commerce.database.product.constant.ProductStatus;
 import com.zerobase.commerce.database.product.constant.SortOrder;
@@ -14,9 +11,9 @@ import com.zerobase.commerce.database.product.repository.ProductRepository;
 import com.zerobase.commerce.database.product.repository.specification.ProductSpecification;
 import com.zerobase.commerce.database.review.domain.Review;
 import com.zerobase.commerce.database.review.repository.ReviewRepository;
-import com.zerobase.commerce.database.user.repository.UserRepository;
 import com.zerobase.commerce.database.wishlist.repository.WishlistRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -34,7 +31,6 @@ import static com.zerobase.commerce.database.product.constant.SortOrder.ASC;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class ProductService {
-    private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final ReviewRepository reviewRepository;
     private final RedisTemplate<String, String> redisTemplate;
@@ -50,7 +46,7 @@ public class ProductService {
         for (Product product : products) {
             double sum = 0.0;
 
-            List<Review> reviews = reviewRepository.findByProductId(product.getId());
+            List<Review> reviews = reviewRepository.findByProductId(product.getId(), null);
             if (reviews.isEmpty()) {
                 continue;
             }
@@ -182,34 +178,34 @@ public class ProductService {
         product.setStatus(ProductStatus.DELETED);
     }
 
-    public List<ProductDto> getProductsBySeller(String sellerId) {
+    public List<ProductDto> getProductsBySeller(String sellerId, Pageable pageable) {
         Specification<Product> specification = Specification
                 .where(ProductSpecification.sellerIdEquals(sellerId))
                 .and(ProductSpecification.notDeleted())
                 .and(ProductSpecification.orderByUpdatedAtDesc());
 
-        return productRepository.findAll(specification)
+        return productRepository.findAll(specification, pageable)
                 .stream()
                 .map(ProductDto::fromEntity)
                 .toList();
     }
 
-    public List<ProductDto> getProductsByName(String name, String filter, String order) {
-        if ((filter == null) != (order == null))
+    public List<ProductDto> getProductsByName(SearchProductByName request, Pageable pageable) {
+        if ((request.getFilter() == null) != (request.getOrder() == null))
             throw new CustomException(ErrorCode.BAD_REQUEST);
 
         Specification<Product> specification = Specification
-                .where(ProductSpecification.nameEquals(name))
+                .where(ProductSpecification.nameLikes(request.getName()))
                 .and(ProductSpecification.publicOnly());
 
-        if (filter != null) {
-            ProductSortFilter productSortFilter = ProductSortFilter.valueOf(filter);
-            SortOrder sortOrder = SortOrder.valueOf(order);
+        if (request.getFilter() != null) {
+            ProductSortFilter productSortFilter = ProductSortFilter.valueOf(request.getFilter());
+            SortOrder sortOrder = SortOrder.valueOf(request.getOrder());
 
             specification.and(ProductSpecification.orderBy(productSortFilter.name(), sortOrder == ASC));
         }
 
-        return productRepository.findAll(specification)
+        return productRepository.findAll(specification, pageable)
                 .stream()
                 .map(ProductDto::fromEntity)
                 .toList();

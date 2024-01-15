@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 @ToString
 public enum ErrorCode {
     UNEXPECTED_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error occurred."),
+    NO_PERMISSION(HttpStatus.FORBIDDEN, "You don't have permission."),
     USER_ID_DUPLICATED(HttpStatus.BAD_REQUEST, "ID duplicated. Please enter a different ID."),
     INVALID_USER_ID(HttpStatus.FORBIDDEN, "The ID you entered is an ID that does not exist. Please enter a different ID."),
     SIGN_IN_FAILED(HttpStatus.BAD_REQUEST, "Login failed. Please check your input again."),

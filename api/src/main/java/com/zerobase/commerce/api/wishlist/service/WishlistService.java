@@ -9,11 +9,11 @@ import com.zerobase.commerce.database.order.repository.OrderRepository;
 import com.zerobase.commerce.database.product.constant.ProductStatus;
 import com.zerobase.commerce.database.product.domain.Product;
 import com.zerobase.commerce.database.product.repository.ProductRepository;
-import com.zerobase.commerce.database.user.domain.User;
 import com.zerobase.commerce.database.user.repository.UserRepository;
 import com.zerobase.commerce.database.wishlist.domain.Wishlist;
 import com.zerobase.commerce.database.wishlist.repository.WishlistRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,28 +50,20 @@ public class WishlistService {
         return WishlistDto.fromEntity(wishlistRepository.save(wishlist));
     }
 
-    public List<WishlistDto> getWishlist(String userId) {
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new CustomException(ErrorCode.INVALID_USER_ID)
-        );
-
-        return wishlistRepository.findByUserIdOrderByAddedAtDesc(user.getId())
+    public List<WishlistDto> getWishlist(String userId, Pageable pageable) {
+        return wishlistRepository.findByUserIdOrderByAddedAtDesc(userId, pageable)
                 .stream()
                 .map(WishlistDto::fromEntity)
                 .toList();
     }
 
     @Transactional
-    public WishlistDto updateWishlist(String userId, Long id, UpdateWishlist request) {
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new CustomException(ErrorCode.INVALID_USER_ID)
-        );
-
-        Wishlist wishlist = wishlistRepository.findById(id).orElseThrow(
+    public WishlistDto updateWishlist(String userId, UpdateWishlist request) {
+        Wishlist wishlist = wishlistRepository.findById(request.getWishlistId()).orElseThrow(
                 () -> new CustomException(ErrorCode.INVALID_WISHLIST_ID)
         );
 
-        if (!Objects.equals(wishlist.getUserId(), user.getId())) {
+        if (!Objects.equals(wishlist.getUserId(), userId)) {
             throw new CustomException(ErrorCode.USER_ID_NOT_SAME);
         }
 

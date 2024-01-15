@@ -6,6 +6,8 @@ import com.zerobase.commerce.api.review.service.ReviewService;
 import com.zerobase.commerce.api.security.TokenAuthenticator;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -26,14 +28,16 @@ public class ReviewController {
     }
 
     @GetMapping("/self")
-    ResponseEntity<?> getSelfReviews(@RequestHeader HttpHeaders headers) {
+    ResponseEntity<?> getSelfReviews(@RequestHeader HttpHeaders headers,
+                                     @PageableDefault Pageable pageable) {
         String userId = tokenAuthenticator.resolveTokenFromHeader(headers);
-        return ResponseEntity.ok(reviewService.getSelfReviews(userId));
+        return ResponseEntity.ok(reviewService.getSelfReviews(userId, pageable));
     }
 
     @GetMapping("/product/{productId}")
-    ResponseEntity<?> getProductReviews(@NotNull(message = "productId must not be null") @PathVariable(name = "productId") UUID productId) {
-        return ResponseEntity.ok(reviewService.getProductReviews(productId));
+    ResponseEntity<?> getProductReviews(@NotNull(message = "productId must not be null") @PathVariable(name = "productId") UUID productId,
+                                        @PageableDefault Pageable pageable) {
+        return ResponseEntity.ok(reviewService.getProductReviews(productId, pageable));
     }
 
     @PostMapping
