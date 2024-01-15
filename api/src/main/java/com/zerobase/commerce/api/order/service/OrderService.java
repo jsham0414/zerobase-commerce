@@ -168,6 +168,9 @@ public class OrderService {
             if (p.getStatus() == ProductStatus.PRIVATE)
                 throw new CustomException(ErrorCode.PRIVATE_PRODUCT);
 
+            if (p.getStatus() == ProductStatus.DELETED)
+                throw new CustomException(ErrorCode.DELETED_PRODUCT);
+
             Order order = orderRepository.save(Order.builder()
                     .userId(userId)
                     .productId(p.getId())

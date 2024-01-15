@@ -70,7 +70,6 @@ public class ReviewService {
             throw new CustomException(ErrorCode.WRITTEN_REVIEW);
         }
 
-
         LocalDateTime now = LocalDateTime.now();
 
         Review review = Review.builder()

@@ -58,6 +58,7 @@ public class ProductService {
             product.setStar(sum / reviews.size());
 
             String key = String.format("%s:%s", product.getId(), product.getName());
+            key = key.replaceAll("\"", "");
 
             try {
                 if (product.getStatus() != ProductStatus.PUBLIC && redisTemplate.boundZSetOps(starKey).score(key) != null) {
