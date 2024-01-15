@@ -1,17 +1,18 @@
 package com.zerobase.commerce.api.user.service;
 
+import com.zerobase.commerce.api.constant.CacheKey;
 import com.zerobase.commerce.api.exception.CustomException;
 import com.zerobase.commerce.api.exception.ErrorCode;
 import com.zerobase.commerce.api.security.TokenProvider;
 import com.zerobase.commerce.api.user.dto.SignInDto;
 import com.zerobase.commerce.api.user.dto.SignUpDto;
-import com.zerobase.commerce.database.constant.AuthorityStatus;
-import com.zerobase.commerce.database.domain.User;
-import com.zerobase.commerce.database.repository.UserRepository;
+import com.zerobase.commerce.database.user.constant.AuthorityStatus;
+import com.zerobase.commerce.database.user.domain.User;
+import com.zerobase.commerce.database.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,12 +20,15 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class AuthService implements UserDetailsService {
     private final UserRepository userRepository;
     private final TokenProvider tokenProvider;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     @Transactional
     public SignUpDto.Response signUp(SignUpDto.Request request) {
@@ -57,7 +61,17 @@ public class AuthService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findById(username).orElseThrow(() -> new UsernameNotFoundException("couldn't find id " + username));
+    public UserDetails loadUserByUsername(String username) {
+        String key = CacheKey.KEY_USER + ":" + username;
+
+        User user = (User) redisTemplate.opsForValue().get(key);
+
+        if (user == null) {
+            user = userRepository.findById(username).orElseThrow(
+                    () -> new CustomException(ErrorCode.INVALID_USER_ID)
+            );
+            redisTemplate.opsForValue().set(key, user, 600, TimeUnit.SECONDS);
+        }
+        return user;
     }
 }

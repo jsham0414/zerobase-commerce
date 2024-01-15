@@ -6,6 +6,14 @@ spring:
     secret: emVyby1iYXNlLXNwcmluZy1ib290LWRpdmlkZW5kLXR1dG9yaWFsLWp3dC1zZWNyZXQta2V5
     prefix: "Bearer"
 
+  redis:
+    host: localhost
+    port: 6379
+
 server:
   port: 8080
 
+scheduler:
+  review:
+    test_update: 0 * * * * *
+    update: 0 0 0/1 * * *

@@ -1,6 +1,6 @@
-package com.zerobase.commerce.database.constant.converter;
+package com.zerobase.commerce.database.user.constant.converter;
 
-import com.zerobase.commerce.database.constant.AuthorityStatus;
+import com.zerobase.commerce.database.user.constant.AuthorityStatus;
 import jakarta.persistence.AttributeConverter;
 
 import java.util.Arrays;

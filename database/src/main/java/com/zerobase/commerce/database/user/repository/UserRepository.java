@@ -1,6 +1,6 @@
-package com.zerobase.commerce.database.repository;
+package com.zerobase.commerce.database.user.repository;
 
-import com.zerobase.commerce.database.domain.User;
+import com.zerobase.commerce.database.user.domain.User;
 import lombok.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

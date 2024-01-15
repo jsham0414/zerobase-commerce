@@ -32,7 +32,7 @@ public class TokenAuthenticator {
         try {
             return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
         } catch (ExpiredJwtException e) {
-            return e.getClaims();
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
         }
     }
 
@@ -48,14 +48,15 @@ public class TokenAuthenticator {
     }
 
     Authentication getAuthentication(String jwt) {
-        var userDetails = authService.loadUserByUsername(getId(jwt));
+        String id = getId(jwt);
+        var userDetails = authService.loadUserByUsername(id);
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
     public String resolveTokenFromHeader(HttpHeaders headers) {
         String token = headers.getFirst(TOKEN_HEADER);
 
-        if (token == null || token.isEmpty() || token.startsWith(tokenPrefix))
+        if (token == null || token.isEmpty() || !token.startsWith(tokenPrefix))
             throw new CustomException(ErrorCode.INVALID_TOKEN);
 
         return getId(token.substring(tokenPrefix.length()));

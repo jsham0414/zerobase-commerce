@@ -1,7 +1,7 @@
 package com.zerobase.commerce.api.user.dto;
 
-import com.zerobase.commerce.database.constant.AuthorityStatus;
-import com.zerobase.commerce.database.domain.User;
+import com.zerobase.commerce.database.user.constant.AuthorityStatus;
+import com.zerobase.commerce.database.user.domain.User;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

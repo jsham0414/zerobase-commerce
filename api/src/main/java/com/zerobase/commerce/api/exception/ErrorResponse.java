@@ -10,6 +10,14 @@ import java.time.LocalDateTime;
 public class ErrorResponse {
     private CustomException customException;
 
+    public static ErrorResponseDto createCustomValidationError(String message) {
+        ErrorCode e = ErrorCode.VALIDATION_ERROR;
+        return ErrorResponseDto.builder()
+                .errorCode(e.getErrorCode())
+                .errorMessage(message)
+                .build();
+    }
+
     public ResponseEntity<?> toResponseEntity() {
         var errorCode = customException.getErrorCode();
 
@@ -34,10 +42,10 @@ public class ErrorResponse {
 
     @Getter
     @AllArgsConstructor
-    static class ErrorResponseDto {
-        private final LocalDateTime timeStamp;
+    public static class ErrorResponseDto {
         private String errorCode;
         private String errorMessage;
+        private LocalDateTime timeStamp;
 
         public static ErrorResponseDtoBuilder builder() {
             return new ErrorResponseDtoBuilder();

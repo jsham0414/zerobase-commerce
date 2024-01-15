@@ -6,7 +6,7 @@ import com.zerobase.commerce.api.security.TokenProvider;
 import com.zerobase.commerce.api.user.dto.UpdateUserInfo;
 import com.zerobase.commerce.api.user.dto.UserDto;
 import com.zerobase.commerce.api.user.service.UserService;
-import com.zerobase.commerce.database.constant.AuthorityStatus;
+import com.zerobase.commerce.database.user.constant.AuthorityStatus;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.zerobase.commerce.database.constant.AuthorityStatus.ROLE_MEMBER;
+import static com.zerobase.commerce.database.user.constant.AuthorityStatus.ROLE_MEMBER;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
